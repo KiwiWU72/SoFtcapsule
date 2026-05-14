@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>軟膠囊精算系統</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{
+  /* ElevenLabs Design System */
+  --color-eggshell:#fdfcfc;--color-powder:#f5f3f1;--color-chalk:#e5e5e5;
+  --color-fog:#b1b0b0;--color-gravel:#777169;--color-slate:#a59f97;--color-obsidian:#000000;
+  /* Functional aliases */
+  --ch:#000000;--wh:#fdfcfc;--card:#ffffff;--sl:#777169;--du:#f5f3f1;
+  --bd:#e5e5e5;--bds:#e5e5e5;--green:#2ecc8a;--rf:4px;--rc:16px;--rp:9999px;
+  --shadow-card:rgba(0,0,0,0.4) 0px 0px 1.143px,rgba(0,0,0,0.04) 0px 2px 4px;
+  --shadow-inset:rgba(0,0,0,0.075) 0px 0px 0px 0.5px inset;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--wh);color:var(--ch);line-height:1.5;font-size:14px;-webkit-font-smoothing:antialiased;}
+header{position:sticky;top:0;z-index:100;background:var(--wh);border-bottom:1px solid var(--bd);padding:0 48px;height:56px;display:flex;align-items:center;justify-content:space-between;}
+.brand{font-family:'Cormorant Garamond',Georgia,serif;font-weight:300;font-size:22px;letter-spacing:-0.02em;}
+.tab-nav{display:flex;gap:3px;background:var(--du);border:1px solid var(--bd);padding:4px;border-radius:var(--rp);}
+.tab-btn{font-size:13px;font-weight:500;padding:7px 20px;border:none;border-radius:var(--rp);cursor:pointer;color:var(--sl);background:transparent;transition:all .18s;}
+.tab-btn.on{background:var(--ch);color:var(--wh);}
+.tab-btn:not(.on):hover{background:rgba(26,26,23,0.07);color:var(--ch);}
+main{max-width:1200px;margin:0 auto;padding:56px 48px 96px;}
+.page{display:none;}.page.on{display:block;}
+.hero{margin-bottom:40px;padding-bottom:32px;border-bottom:1px solid var(--bd);}
+.hero h1{font-family:'Cormorant Garamond',Georgia,serif;font-weight:300;font-size:48px;line-height:1.08;letter-spacing:-0.96px;margin-bottom:12px;}
+.hero p{font-size:15px;color:var(--sl);}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:56px;}
+@media(max-width:800px){.grid2{grid-template-columns:1fr;}main{padding:32px 20px 64px;}header{padding:0 20px;}.hero h1{font-size:32px;letter-spacing:-0.64px;}}
+.sec{font-size:11px;font-weight:600;letter-spacing:1.4px;text-transform:uppercase;color:var(--sl);border-top:1px solid var(--bd);padding-top:20px;margin:24px 0 12px;}
+.sec.first{border-top:none;padding-top:0;margin-top:0;}
+.ctl{margin-bottom:13px;}
+.lbl{display:flex;justify-content:space-between;align-items:center;font-size:13px;margin-bottom:6px;}
+.bdg{font-size:12px;font-weight:600;background:var(--du);border:1px solid var(--bd);padding:2px 9px;border-radius:var(--rp);}
+.ptag{font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;border:1px solid var(--bds);padding:2px 8px;border-radius:var(--rp);color:var(--sl);white-space:nowrap;}
+.irow{display:flex;align-items:center;gap:7px;}.irow input[type=number]{flex:1;min-width:0;}
+input[type=number]{width:100%;padding:9px 12px;font-family:'Inter',sans-serif;font-size:14px;color:var(--ch);background:var(--card);border:1px solid var(--bd);border-radius:var(--rf);outline:none;transition:border-color .15s;-moz-appearance:textfield;box-shadow:var(--shadow-inset);}
+input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;}
+input[type=number]:focus{border-color:var(--ch);}
+input[type=text]{width:100%;padding:9px 12px;font-family:'Inter',sans-serif;font-size:14px;color:var(--ch);background:var(--card);border:1px solid var(--bd);border-radius:var(--rf);outline:none;transition:border-color .15s;box-shadow:var(--shadow-inset);}
+input[type=text]:focus{border-color:var(--ch);}
+select{width:100%;padding:9px 12px;font-family:'Inter',sans-serif;font-size:14px;color:var(--ch);background:var(--card);border:1px solid var(--bd);border-radius:var(--rf);outline:none;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23777169' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;box-shadow:var(--shadow-inset);}
+select:focus{border-color:var(--ch);}
+input[type=range]{width:100%;height:2px;margin-top:2px;-webkit-appearance:none;appearance:none;background:var(--bd);border-radius:2px;outline:none;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--ch);cursor:pointer;box-shadow:0 0 0 3px var(--card),0 0 0 4px rgba(0,0,0,0.15);}
+.pb{background:var(--card);border:1px solid var(--bd);border-radius:var(--rc);padding:16px 18px;margin-bottom:12px;box-shadow:var(--shadow-card);}
+.pbt{font-size:10px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:var(--sl);margin-bottom:12px;}
+.preset-row{display:flex;gap:6px;margin-bottom:10px;}
+.preset-btn{font-family:'Inter',sans-serif;font-size:12px;font-weight:500;padding:5px 14px;border:1px solid var(--bd);border-radius:var(--rp);cursor:pointer;color:var(--sl);background:transparent;transition:all .15s;white-space:nowrap;}
+.preset-btn.on{background:var(--ch);color:var(--wh);border-color:var(--ch);}
+.preset-btn:not(.on):hover{background:var(--du);color:var(--ch);}
+.preset-note{font-size:11px;color:var(--sl);margin-bottom:12px;padding:8px 10px;background:var(--du);border-left:2px solid var(--bd);line-height:1.6;}
+.adr{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(0,0,0,0.05);}
+.adr:last-child{border:none;}
+.addon-cb{width:17px;height:17px;accent-color:var(--ch);cursor:pointer;flex-shrink:0;}
+.adl{font-size:13px;flex:1;color:var(--ch);}
+.adp{display:flex;align-items:center;gap:5px;}
+.adp input{width:60px;text-align:right;font-size:13px;padding:5px 8px;}
+.adu{font-size:11px;color:var(--sl);white-space:nowrap;}
+.drow{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--bd);font-size:13px;}
+.drow:last-child{border:none;}
+.drow .dl{color:var(--sl);}
+.drow .dv{font-weight:600;}
+.drow.hl{background:var(--du);padding:10px 12px;margin:3px -12px;border:none;border-radius:var(--rf);}
+.refbanner{background:var(--card);border:1px solid var(--bd);border-radius:var(--rc);padding:16px 20px;margin-bottom:32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;box-shadow:var(--shadow-card);}
+.refbanner .rl{font-size:10px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:var(--sl);margin-bottom:3px;}
+.refbanner .rv{font-size:15px;font-weight:600;}
+.refbanner .rm{font-size:12px;color:var(--sl);}
+.cgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px;}
+.cc{border:1px solid var(--bd);border-radius:var(--rc);padding:18px;background:var(--card);box-shadow:var(--shadow-card);}
+.cc .cl{font-size:10px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:var(--sl);margin-bottom:7px;}
+.cc .cn{font-family:'Cormorant Garamond',Georgia,serif;font-weight:300;font-size:28px;letter-spacing:-.56px;line-height:1.1;}
+.cc .cs{font-size:11px;color:var(--sl);margin-top:4px;}
+.cc.dk{background:var(--ch);color:var(--wh);border-color:transparent;}
+.cc.dk .cl,.cc.dk .cs{color:rgba(253,252,252,0.45);}
+.cc.dk .cn{color:var(--wh);}
+.rh{background:var(--ch);color:var(--wh);padding:24px 28px;margin-bottom:20px;border-radius:var(--rc);}
+.rh .rl{font-size:11px;letter-spacing:1.4px;text-transform:uppercase;opacity:.5;margin-bottom:7px;}
+.rh .rn{font-family:'Cormorant Garamond',Georgia,serif;font-weight:300;font-size:44px;letter-spacing:-.88px;line-height:1;color:var(--wh);}
+.rh .ru{font-size:12px;opacity:.45;margin-top:7px;}
+.mrrow{display:flex;align-items:center;gap:12px;background:var(--du);border:1px solid var(--bd);border-radius:var(--rf);padding:12px 14px;margin-top:14px;}
+.mrrow label{font-size:13px;color:var(--sl);flex:1;}
+.mrrow input[type=number]{width:70px;text-align:center;}
+.export-btn{width:100%;margin-top:24px;padding:12px 24px;font-family:'Inter',sans-serif;font-size:14px;font-weight:500;letter-spacing:0.1px;color:var(--wh);background:var(--ch);border:1px solid var(--ch);border-radius:var(--rp);cursor:pointer;transition:all .18s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.export-btn:hover{background:#333;border-color:#333;}
+.export-btn svg{width:16px;height:16px;flex-shrink:0;}
+.note{font-size:12px;color:var(--sl);padding-top:14px;border-top:1px solid var(--bd);margin-top:24px;line-height:1.9;}
+.sub-hd{font-size:10px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:var(--sl);margin:18px 0 10px;padding-top:16px;border-top:1px solid var(--bd);}
+.helper{font-size:12px;color:var(--sl);margin-top:5px;}
+.box-fixed{background:var(--du);border:1px solid var(--bd);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.box-fixed-label{font-size:13px;font-weight:500;}
+.box-fixed-sub{font-size:11px;color:var(--sl);}
+
+/* ── 暗色流程動畫區 ── */
+.flow-wrap{background:#0a0d14;border-radius:var(--rc);padding:18px 18px 12px;margin-bottom:16px;overflow:hidden;}
+.flow-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.flow-hint{font-size:11px;color:rgba(255,255,255,0.38);}
+.flow-stats{display:flex;gap:14px;font-size:12px;}
+.flow-stats .fs-caps{color:#2ecc8a;font-weight:600;}
+.flow-stats .fs-yield{color:#60a5fa;}
+.flow-stats .fs-shell{color:#c084fc;}
+.flow-meta{display:flex;justify-content:space-between;margin-top:10px;font-size:11px;color:rgba(255,255,255,0.3);}
+.shell-ref-box{font-size:11px;color:var(--sl);background:var(--card);border:1px solid var(--bd);border-radius:var(--rc);padding:12px 14px;margin-top:-4px;margin-bottom:13px;line-height:1.85;box-shadow:var(--shadow-card);}
+.shell-ref-title{font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;margin-bottom:8px;color:var(--sl);}
+.shell-ref-row{display:flex;justify-content:space-between;padding:2px 0;}
+.shell-ref-row em{font-style:normal;color:var(--sl);opacity:.65;}
+.shell-suggest-row{display:flex;justify-content:space-between;align-items:center;margin-top:7px;padding-top:7px;border-top:1px solid var(--bd);font-size:11px;}
+.shell-suggest-row strong{color:var(--ch);}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">軟膠囊精算系統</div>
+  <nav class="tab-nav">
+    <button class="tab-btn on" onclick="sw(this,'prod')">產量預估</button>
+    <button class="tab-btn" onclick="sw(this,'cost')">成本估算</button>
+  </nav>
+</header>
+
+<main>
+
+<!-- ═══════ PAGE 1：產量精算 ═══════ -->
+<div id="pg-prod" class="page on">
+  <div class="hero">
+    <h1>產量預估模型</h1>
+    <p>質量守恆 × 膠網幾何回收收斂級數 — 從明膠粉到成品顆數的完整換算</p>
+  </div>
+  <div class="grid2">
+
+    <!-- 左欄：輸入 -->
+    <div>
+      <div class="sec first">原料投入</div>
+      <div class="ctl">
+        <div class="lbl">投入明膠粉總重</div>
+        <div class="irow"><input type="number" id="gW" value="200" min="1" step="1"><span class="ptag">kg</span></div>
+      </div>
+      <div class="sec">化膠配比（基準：明膠 = 1）</div>
+      <div class="pb">
+        <div class="pbt">季節配方快選（僅供參考）</div>
+        <div class="preset-row">
+          <button class="preset-btn on" id="btnWinter" onclick="setPreset('winter',this)">冬季配方</button>
+          <button class="preset-btn" id="btnSummer" onclick="setPreset('summer',this)">夏季配方</button>
+          <button class="preset-btn" id="btnCustom" onclick="setPreset('custom',this)">自訂</button>
+        </div>
+        <div class="preset-note" id="presetNote">高塑化型（High-Plasticizer）— 甘油 0.40，擴大自由體積，抵抗低溫脆性斷裂。<br>適應環境：&lt; 15°C，RH &lt; 30%。<br>代價：乾燥時間長、氧氣阻絕力相對較弱。</div>
+        <div class="pbt" style="margin-top:10px;">塑化劑 + 水的添加比例</div>
+        <div class="ctl"><div class="lbl">甘油比例 (Glycerin)<span class="bdg" id="vGly">0.40</span></div><input type="range" id="gly" value="0.4" min="0" max="0.8" step="0.01"></div>
+        <div class="ctl"><div class="lbl">山梨醇比例 (Sorbitol)<span class="bdg" id="vSor">0.00</span></div><input type="range" id="sor" value="0" min="0" max="0.8" step="0.01"></div>
+        <div class="ctl"><div class="lbl">純水比例 (Water)<span class="bdg" id="vWat">0.70</span></div><input type="range" id="wat" value="0.7" min="0.4" max="1.2" step="0.01"></div>
+        <div style="font-size:12px;color:var(--sl);text-align:right;margin-top:5px;">明膠 : 塑化劑 : 水 = 1 : <span id="vTpl">0.40</span> : <span id="vTw">0.70</span></div>
+      </div>
+      <div class="sec">製程損耗 &amp; 回收</div>
+      <div class="ctl">
+        <div class="lbl">單顆濕膠皮目標重量<span class="bdg" style="font-weight:400;font-size:11px;">預設充填油脂 500 mg</span></div>
+        <div class="irow"><input type="number" id="shW" value="330" min="100" step="10"><span class="ptag">mg / 顆</span></div>
+      </div>
+      <div class="shell-ref-box">
+        <div class="shell-ref-title">膠皮重對應填充量（模具參考）</div>
+        <div class="shell-ref-row"><span>膠皮 250 mg &nbsp;<em>#5/#6 Oval</em></span><span>→ 油脂 350 mg</span></div>
+        <div class="shell-ref-row"><span>膠皮 330 mg &nbsp;<em>#10 Oval</em></span><span>→ 油脂 500 mg</span></div>
+        <div class="shell-ref-row"><span>膠皮 550 mg &nbsp;<em>#20 Oblong</em></span><span>→ 油脂 1000 mg</span></div>
+        <div class="shell-suggest-row">
+          <span>依成本頁填充量建議：<strong id="shSuggest">—</strong></span>
+          <button class="preset-btn" id="btnApplySuggest" onclick="applyShellSuggest()" style="display:none;">套用建議值</button>
+        </div>
+      </div>
+      <div class="ctl"><div class="lbl">物理管線殘留損耗<span class="bdg" id="vPL">5%</span></div><input type="range" id="pL" value="5" min="0" max="15" step="1"></div>
+      <div class="ctl"><div class="lbl">膠網廢料率<span class="bdg" id="vSc">45%</span></div><input type="range" id="sc" value="45" min="20" max="70" step="1"></div>
+      <div class="ctl"><div class="lbl">膠網極限回收率<span class="bdg" id="vRc">30%</span></div><input type="range" id="rc" value="30" min="0" max="100" step="1"></div>
+    </div>
+
+    <!-- 右欄：動畫流程圖 -->
+    <div>
+      <div class="flow-wrap">
+        <div class="flow-header">
+          <span class="flow-hint">計算機已就緒。調整左側參數可即時觀看產量變化。</span>
+          <div class="flow-stats">
+            <span class="fs-caps" id="fdTopCaps">0 顆</span>
+            <span class="fs-yield" id="fdTopYield">0%</span>
+            <span class="fs-shell" id="fdTopShell">0 kg</span>
+          </div>
+        </div>
+
+        <!-- SVG Flow Diagram -->
+        <svg viewBox="0 0 520 228" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;">
+
+          <!-- Subtle dot grid background -->
+          <defs>
+            <pattern id="dotgrid" width="22" height="22" patternUnits="userSpaceOnUse">
+              <circle cx="11" cy="11" r="0.9" fill="rgba(255,255,255,0.06)"/>
+            </pattern>
+          </defs>
+          <rect width="520" height="228" fill="url(#dotgrid)"/>
+
+          <!-- ── Connection lines (dashed) ── -->
+          <line x1="105" y1="110" x2="165" y2="110" stroke="#3b82f6" stroke-width="2" stroke-dasharray="5,4" opacity="0.5"/>
+          <line x1="235" y1="110" x2="295" y2="110" stroke="#14b8a6" stroke-width="2" stroke-dasharray="5,4" opacity="0.5"/>
+          <line x1="365" y1="110" x2="425" y2="110" stroke="#22c55e" stroke-width="2" stroke-dasharray="5,4" opacity="0.5"/>
+
+          <!-- ── Loss branch (up, between n1-n2) ── -->
+          <line x1="135" y1="110" x2="135" y2="52" stroke="#f472b6" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.75"/>
+          <circle cx="135" cy="110" r="4.5" fill="#f472b6" opacity="0.85"/>
+          <!-- Loss arrow head (up) -->
+          <polyline points="129,56 135,48 141,56" fill="none" stroke="#f472b6" stroke-width="1.5" stroke-linejoin="round" opacity="0.85"/>
+
+          <!-- ── Waste branch (down, between n3-n4) ── -->
+          <line x1="395" y1="110" x2="395" y2="170" stroke="#f472b6" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.75"/>
+          <circle cx="395" cy="110" r="4.5" fill="#f472b6" opacity="0.85"/>
+          <!-- Waste arrow head (down) -->
+          <polyline points="389,164 395,172 401,164" fill="none" stroke="#f472b6" stroke-width="1.5" stroke-linejoin="round" opacity="0.85"/>
+
+          <!-- ── Recovery path (from waste back to node3) ── -->
+          <path d="M 395,192 Q 370,218 335,148" fill="none" stroke="#22c55e" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.75"/>
+          <!-- Recovery arrow head -->
+          <polyline points="326,143 335,150 341,140" fill="none" stroke="#22c55e" stroke-width="1.5" stroke-linejoin="round" opacity="0.85"/>
+
+          <!-- ── Animated dots on main paths ── -->
+          <!-- path n1→n2 (blue) -->
+          <circle r="4.5" fill="#60a5fa" opacity="0.9"><animateMotion dur="1.8s" repeatCount="indefinite" begin="0s" path="M 105,110 L 165,110"/></circle>
+          <circle r="4.5" fill="#60a5fa" opacity="0.9"><animateMotion dur="1.8s" repeatCount="indefinite" begin="0.6s" path="M 105,110 L 165,110"/></circle>
+          <circle r="4.5" fill="#60a5fa" opacity="0.9"><animateMotion dur="1.8s" repeatCount="indefinite" begin="1.2s" path="M 105,110 L 165,110"/></circle>
+          <!-- path n2→n3 (teal) -->
+          <circle r="4.5" fill="#2dd4bf" opacity="0.9"><animateMotion dur="1.8s" repeatCount="indefinite" begin="0.1s" path="M 235,110 L 295,110"/></circle>
+          <circle r="4.5" fill="#2dd4bf" opacity="0.9"><animateMotion dur="1.8s" repeatCount="indefinite" begin="0.7s" path="M 235,110 L 295,110"/></circle>
+          <circle r="4.5" fill="#2dd4bf" opacity="0.9"><animateMotion dur="1.8s" repeatCount="indefinite" begin="1.3s" path="M 235,110 L 295,110"/></circle>
+          <!-- path n3→n4 (green) -->
+          <circle r="4.5" fill="#4ade80" opacity="0.9"><animateMotion dur="1.8s" repeatCount="indefinite" begin="0.2s" path="M 365,110 L 425,110"/></circle>
+          <circle r="4.5" fill="#4ade80" opacity="0.9"><animateMotion dur="1.8s" repeatCount="indefinite" begin="0.8s" path="M 365,110 L 425,110"/></circle>
+          <circle r="4.5" fill="#4ade80" opacity="0.9"><animateMotion dur="1.8s" repeatCount="indefinite" begin="1.4s" path="M 365,110 L 425,110"/></circle>
+
+          <!-- ── NODE 1: 明膠投入 (blue) ── -->
+          <circle cx="70" cy="110" r="36" fill="rgba(59,130,246,0.1)" stroke="#3b82f6" stroke-width="2.5"/>
+          <!-- Beaker icon -->
+          <path d="M 62,97 L 58,126 Q 58,130 62,130 L 78,130 Q 82,130 82,126 L 78,97 Z" fill="rgba(59,130,246,0.22)" stroke="#60a5fa" stroke-width="1.8" stroke-linejoin="round"/>
+          <line x1="60" y1="97" x2="80" y2="97" stroke="#60a5fa" stroke-width="2.2"/>
+          <line x1="64" y1="117" x2="76" y2="117" stroke="#60a5fa" stroke-width="1.2" opacity="0.5"/>
+          <text x="70" y="60" text-anchor="middle" fill="#93c5fd" font-size="10.5" font-weight="500" font-family="Inter,sans-serif">明膠投入</text>
+          <text id="fdKg1" x="70" y="163" text-anchor="middle" fill="#60a5fa" font-size="12.5" font-weight="700" font-family="Inter,sans-serif">0.0 kg</text>
+
+          <!-- ── NODE 2: 濕膠液 (teal) ── -->
+          <circle cx="200" cy="110" r="36" fill="rgba(20,184,166,0.1)" stroke="#14b8a6" stroke-width="2.5"/>
+          <!-- Waves -->
+          <path d="M 184,106 Q 192,99 200,106 Q 208,113 216,106" fill="none" stroke="#2dd4bf" stroke-width="2.4" stroke-linecap="round"/>
+          <path d="M 184,114 Q 192,107 200,114 Q 208,121 216,114" fill="none" stroke="#2dd4bf" stroke-width="2.4" stroke-linecap="round"/>
+          <path d="M 184,122 Q 192,115 200,122 Q 208,129 216,122" fill="none" stroke="#2dd4bf" stroke-width="1.8" stroke-linecap="round"/>
+          <text x="200" y="60" text-anchor="middle" fill="#5eead4" font-size="10.5" font-weight="500" font-family="Inter,sans-serif">濕膠液</text>
+          <text id="fdKg2" x="200" y="163" text-anchor="middle" fill="#2dd4bf" font-size="12.5" font-weight="700" font-family="Inter,sans-serif">0.0 kg</text>
+
+          <!-- ── NODE 3: 生產用膠 (green) ── -->
+          <circle cx="330" cy="110" r="36" fill="rgba(34,197,94,0.1)" stroke="#22c55e" stroke-width="2.5"/>
+          <!-- Gear icon -->
+          <circle cx="330" cy="110" r="12" fill="rgba(34,197,94,0.18)" stroke="#4ade80" stroke-width="1.8"/>
+          <circle cx="330" cy="110" r="5" fill="#22c55e"/>
+          <circle cx="330" cy="110" r="19" fill="none" stroke="#4ade80" stroke-width="4.5" stroke-dasharray="4.8,3.7"/>
+          <text x="330" y="60" text-anchor="middle" fill="#86efac" font-size="10.5" font-weight="500" font-family="Inter,sans-serif">生產用膠</text>
+          <text id="fdKg3" x="330" y="163" text-anchor="middle" fill="#4ade80" font-size="12.5" font-weight="700" font-family="Inter,sans-serif">0.0 kg</text>
+
+          <!-- ── NODE 4: 成品膠皮 (purple) ── -->
+          <circle cx="460" cy="110" r="36" fill="rgba(168,85,247,0.1)" stroke="#a855f7" stroke-width="2.5"/>
+          <!-- Pill icon -->
+          <rect x="442" y="102" width="36" height="16" rx="8" fill="rgba(168,85,247,0.22)" stroke="#c084fc" stroke-width="1.8"/>
+          <line x1="460" y1="102" x2="460" y2="118" stroke="#c084fc" stroke-width="1.4" opacity="0.55"/>
+          <ellipse cx="451" cy="110" rx="5" ry="6" fill="#a855f7" opacity="0.45"/>
+          <text x="460" y="60" text-anchor="middle" fill="#d8b4fe" font-size="10.5" font-weight="500" font-family="Inter,sans-serif">成品膠皮</text>
+          <text id="fdKg4" x="460" y="163" text-anchor="middle" fill="#c084fc" font-size="12.5" font-weight="700" font-family="Inter,sans-serif">0.0 kg</text>
+
+          <!-- ── Label badges ── -->
+          <!-- Loss badge -->
+          <rect x="100" y="27" width="70" height="21" rx="10.5" fill="rgba(244,114,182,0.15)" stroke="#f472b6" stroke-width="1.4"/>
+          <text id="fdLossLabel" x="135" y="42" text-anchor="middle" fill="#f472b6" font-size="10.5" font-weight="600" font-family="Inter,sans-serif">損耗 -5%</text>
+
+          <!-- Waste badge -->
+          <rect x="355" y="172" width="80" height="21" rx="10.5" fill="rgba(244,114,182,0.15)" stroke="#f472b6" stroke-width="1.4"/>
+          <text id="fdScrapLabel" x="395" y="187" text-anchor="middle" fill="#f472b6" font-size="10.5" font-weight="600" font-family="Inter,sans-serif">廢料 -45%</text>
+
+          <!-- Recovery badge -->
+          <rect x="316" y="205" width="90" height="21" rx="10.5" fill="rgba(34,197,94,0.12)" stroke="#22c55e" stroke-width="1.4"/>
+          <text id="fdRecovLabel" x="361" y="220" text-anchor="middle" fill="#4ade80" font-size="10.5" font-weight="600" font-family="Inter,sans-serif">回收 +30%</text>
+
+        </svg>
+
+        <div class="flow-meta">
+          <span>配方比例 明膠:塑化劑:水 = 1:<span id="fdRatioP">0.40</span>:<span id="fdRatioW">0.70</span></span>
+          <span>目標單顆重量: <span id="fdShellWt">350</span> mg</span>
+        </div>
+      </div>
+
+      <!-- 關鍵數據列 -->
+      <div class="drow"><span class="dl">幾何收斂有效利用率</span><strong class="dv"><span id="oEY">0</span>%</strong></div>
+      <div class="drow hl"><span class="dl">▶ 實際成為膠皮的總重量</span><strong class="dv"><span id="oFS">0</span> kg</strong></div>
+      <div class="drow"><span class="dl">單顆膠皮設定重量</span><strong class="dv"><span id="oSW">350</span> mg</strong></div>
+      <p class="note">有效利用率公式（無窮等比級數）：<strong>U = (1 − 廢料率) ÷ (1 − 廢料率 × 回收率)</strong><br>切換至「成本估算」頁面，數值自動帶入。</p>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ═══════ PAGE 2：成本估算 ═══════ -->
+<div id="pg-cost" class="page">
+  <div class="hero">
+    <h1>成本估算</h1>
+    <p>原料 → PTP 打片 → 入鋁袋 → 入盒 → 裝箱出貨，全流程成本拆解</p>
+  </div>
+
+  <div class="refbanner">
+    <div>
+      <div class="rl">從產量精算帶入</div>
+      <div class="rv">本批次 <span id="cRC">0</span> 顆</div>
+    </div>
+    <div class="rm">明膠 <span id="cRG">100</span> kg｜實際膠皮重 <span id="cRS">0</span> kg</div>
+  </div>
+
+  <div class="grid2">
+
+    <!-- 左欄：輸入 -->
+    <div>
+
+      <div class="sec first">填充物成本</div>
+      <div class="ctl">
+        <div class="lbl">填充物種類</div>
+        <select id="fillType">
+          <option value="fish">魚油</option>
+          <option value="algae">藻油</option>
+          <option value="inca">印加果油</option>
+          <option value="avocado">酪梨油</option>
+          <option value="pumpkin">南瓜籽油</option>
+          <option value="nigella">黑種草籽油</option>
+          <option value="sea">沙棘油</option>
+          <option value="other">其他（自填）</option>
+        </select>
+      </div>
+      <div class="ctl" id="fillOtherBox" style="display:none;">
+        <div class="lbl">填充物名稱</div>
+        <input type="text" id="fillOtherName" placeholder="輸入原料名稱">
+      </div>
+      <div class="ctl">
+        <div class="lbl">填充物單價</div>
+        <div class="irow"><span class="ptag">NT$</span><input type="number" id="fP" value="5000" min="0" step="100"><span class="ptag">/ kg</span></div>
+      </div>
+      <div class="ctl">
+        <div class="lbl">每顆填充量</div>
+        <div class="irow"><input type="number" id="fM" value="500" min="50" step="10"><span class="ptag">mg / 顆</span></div>
+      </div>
+      <div class="ctl">
+        <div class="lbl">桶底損耗率（填充物）<span class="bdg" id="vFL">3%</span></div>
+        <input type="range" id="fL" value="3" min="0" max="15" step="0.5">
+        <div class="helper">損耗量以所選填充物單價計入成本</div>
+      </div>
+
+      <div class="sec">膠皮原料成本</div>
+      <div class="ctl">
+        <div class="lbl">Gelita 牛骨膠單價</div>
+        <div class="irow"><span class="ptag">NT$</span><input type="number" id="gP" value="300" min="0" step="10"><span class="ptag">/ kg</span></div>
+      </div>
+      <div class="ctl">
+        <div class="lbl">甘油單價</div>
+        <div class="irow"><span class="ptag">NT$</span><input type="number" id="gyP" value="120" min="0" step="5"><span class="ptag">/ kg</span></div>
+      </div>
+      <div class="ctl">
+        <div class="lbl">山梨醇單價 (Sorbitol)<span id="sorWarnBadge" style="display:none;font-size:10px;font-weight:500;background:#fff8e1;border:1px solid #f59e0b;color:#92400e;padding:2px 8px;border-radius:9999px;">已啟用 — 計入成本</span></div>
+        <div class="irow"><span class="ptag">NT$</span><input type="number" id="sorP" value="150" min="0" step="5"><span class="ptag">/ kg</span></div>
+        <div class="helper">山梨醇用量由產量頁「配比」決定；若比例為 0 則此欄不影響成本</div>
+      </div>
+
+      <div class="sec">入鋁袋</div>
+      <div class="pb">
+        <div class="pbt">每片 PTP = 10 粒膠囊</div>
+        <div class="ctl">
+          <div class="lbl">PTP 打片（公版）</div>
+          <div class="irow"><span class="ptag">NT$</span><input type="number" id="ptpP" value="5" min="0" step="0.5"><span class="ptag">/ 片</span></div>
+        </div>
+        <div class="ctl">
+          <div class="lbl">三片入鋁袋 + 效期打印</div>
+          <div class="irow"><span class="ptag">NT$</span><input type="number" id="bagP" value="7" min="0" step="0.5"><span class="ptag">/ 片</span></div>
+        </div>
+      </div>
+
+      <div class="sec">入盒</div>
+      <div class="pb">
+        <div class="pbt">一包（3片）鋁袋入盒 — 30 顆 / 盒</div>
+        <div class="ctl">
+          <div class="lbl">入盒單價</div>
+          <div class="irow"><span class="ptag">NT$</span><input type="number" id="boxPA" value="6" min="0" step="0.5"><span class="ptag">/ 片</span></div>
+        </div>
+        <div class="helper" style="margin-top:0;">每盒 = 3 片 × 10 顆 = 30 顆（固定規格）</div>
+      </div>
+
+      <div class="sec">入盒追加（可單獨勾選取消）</div>
+      <div class="pb">
+        <div class="adr">
+          <input type="checkbox" class="addon-cb" id="adBase" checked>
+          <span class="adl">紙盒加底座</span>
+          <div class="adp"><span style="font-size:12px;color:var(--sl);">NT$</span><input type="number" id="prBase" value="3" min="0" step="0.5"><span class="adu">/ 盒</span></div>
+        </div>
+        <div class="adr">
+          <input type="checkbox" class="addon-cb" id="adLabel" checked>
+          <span class="adl">貼雷射標貼紙</span>
+          <div class="adp"><span style="font-size:12px;color:var(--sl);">NT$</span><input type="number" id="prLabel" value="2.5" min="0" step="0.5"><span class="adu">/ 張（1張/盒）</span></div>
+        </div>
+        <div class="adr">
+          <input type="checkbox" class="addon-cb" id="adDot" checked>
+          <span class="adl">外盒上下圓點貼紙 ×2</span>
+          <div class="adp"><span style="font-size:12px;color:var(--sl);">NT$</span><input type="number" id="prDot" value="3" min="0" step="0.5"><span class="adu">/ 張 × 2</span></div>
+        </div>
+        <div class="adr">
+          <input type="checkbox" class="addon-cb" id="adShrink" checked>
+          <span class="adl">外盒收縮膜</span>
+          <div class="adp"><span style="font-size:12px;color:var(--sl);">NT$</span><input type="number" id="prShrink" value="5.5" min="0" step="0.5"><span class="adu">/ 盒</span></div>
+        </div>
+      </div>
+
+      <div class="sec">裝箱 &amp; 運費</div>
+      <div class="ctl">
+        <div class="lbl">每箱盒數</div>
+        <div class="irow"><input type="number" id="bPC" value="48" min="1" step="1"><span class="ptag">盒 / 箱</span></div>
+      </div>
+      <div class="ctl">
+        <div class="lbl">每箱運費</div>
+        <div class="irow"><span class="ptag">NT$</span><input type="number" id="sH" value="300" min="0" step="50"><span class="ptag">/ 箱</span></div>
+      </div>
+
+    </div>
+
+    <!-- 右欄：成本結果 -->
+    <div>
+      <div class="rh">
+        <div class="rl">每顆總成本</div>
+        <div class="rn" id="cPC">NT$ 0.000</div>
+        <div class="ru">含填充物、膠皮、打片、鋁袋、入盒、追加、運費</div>
+      </div>
+
+      <div class="drow"><span class="dl">填充物（含桶底損耗）</span><strong class="dv">NT$ <span id="cF">0.000</span></strong></div>
+      <div class="drow"><span class="dl">膠皮原料（Gelita + 甘油）</span><strong class="dv">NT$ <span id="cS">0.000</span></strong></div>
+      <div class="drow"><span class="dl">PTP 打片</span><strong class="dv">NT$ <span id="cPtp">0.000</span></strong></div>
+      <div class="drow"><span class="dl">三片入鋁袋 + 效期打印</span><strong class="dv">NT$ <span id="cBag">0.000</span></strong></div>
+      <div class="drow"><span class="dl">入盒（一包3片 = 30顆/盒）</span><strong class="dv">NT$ <span id="cBox">0.000</span></strong></div>
+      <div class="drow"><span class="dl">入盒追加（勾選項目合計）</span><strong class="dv">NT$ <span id="cAddon">0.000</span></strong></div>
+      <div class="drow hl"><span class="dl">運費（÷ 箱內顆數）</span><strong class="dv">NT$ <span id="cShip">0.000</span></strong></div>
+
+      <div class="cgrid">
+        <div class="cc">
+          <div class="cl">每盒成本</div>
+          <div class="cn">NT$ <span id="cPB">0.00</span></div>
+          <div class="cs">30 顆 / 盒</div>
+        </div>
+        <div class="cc dk">
+          <div class="cl">每箱成本</div>
+          <div class="cn">NT$ <span id="cPCase">0.00</span></div>
+          <div class="cs"><span id="cCaseDesc">48 盒 / 箱</span></div>
+        </div>
+      </div>
+
+      <div class="sub-hd">建議售價試算</div>
+      <div class="mrrow">
+        <label>毛利率目標</label>
+        <input type="number" id="mG" value="40" min="1" max="99" step="1">
+        <span class="ptag">%</span>
+      </div>
+      <div class="helper" style="padding-left:4px;margin-top:6px;">建議售價 = 成本 ÷ (1 − 毛利率)，取整數</div>
+      <div class="cgrid">
+        <div class="cc">
+          <div class="cl">建議零售 / 盒</div>
+          <div class="cn">NT$ <span id="sPB">0</span></div>
+          <div class="cs">毛利 <span id="sML">40</span>%</div>
+        </div>
+        <div class="cc">
+          <div class="cl">建議出貨 / 箱</div>
+          <div class="cn">NT$ <span id="sPCase">0</span></div>
+          <div class="cs">毛利 <span id="sML2">40</span>%</div>
+        </div>
+      </div>
+
+      <div class="sub-hd">批次盈虧試算</div>
+      <div class="cgrid">
+        <div class="cc">
+          <div class="cl">本批次可出貨</div>
+          <div class="cn"><span id="batchBoxes">0</span> 盒</div>
+          <div class="cs"><span id="batchCases">0</span> 箱 <span id="batchRem"></span></div>
+        </div>
+        <div class="cc">
+          <div class="cl">預估總收入</div>
+          <div class="cn">NT$ <span id="batchRev">0</span></div>
+          <div class="cs">建議零售 × 盒數</div>
+        </div>
+      </div>
+      <div class="cgrid" style="margin-top:8px;">
+        <div class="cc">
+          <div class="cl">批次總成本</div>
+          <div class="cn">NT$ <span id="batchCostTotal">0</span></div>
+          <div class="cs">原料 + 包裝 + 運費合計</div>
+        </div>
+        <div class="cc dk">
+          <div class="cl">批次毛利</div>
+          <div class="cn">NT$ <span id="batchProfit">0</span></div>
+          <div class="cs">毛利率 <span id="batchML">40</span>%</div>
+        </div>
+      </div>
+
+      <div class="sub-hd" style="border-top-color:var(--bd);">逆向定價推算</div>
+      <div class="helper" style="margin-bottom:8px;">已知市場終端售價 → 倒推實際毛利率是否達標</div>
+      <div class="mrrow">
+        <label>市場終端定價 / 盒</label>
+        <span class="ptag">NT$</span>
+        <input type="number" id="targetPrice" value="800" min="1" step="10">
+      </div>
+      <div class="cgrid" style="margin-top:10px;">
+        <div class="cc">
+          <div class="cl">實際毛利率</div>
+          <div class="cn"><span id="revMargin">—</span></div>
+          <div class="cs">以上方售價扣除成本</div>
+        </div>
+        <div class="cc">
+          <div class="cl">每盒毛利金額</div>
+          <div class="cn">NT$ <span id="revProfit">—</span></div>
+          <div class="cs">售價 − 每盒成本</div>
+        </div>
+      </div>
+
+      <button class="export-btn" onclick="exportExcel()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        匯出 Excel 成本報表
+      </button>
+
+      <p class="note">
+        ▸ 每片 PTP = 10 粒膠囊（固定）<br>
+        ▸ 每鋁袋 = 3 片 = 30 顆；一包入盒 = 30顆/盒<br>
+        ▸ 桶底損耗以所選填充物單價折算<br>
+        ▸ 膠皮成本根據「產量精算」頁的明膠投入量自動計算
+      </p>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<script>
+// ═══ 共用狀態 ═══
+var S={caps:0,gW:200,fSM:0,glyR:0.4,sorR:0.0,fM:500};
+var FILL_PRICES={fish:5000,algae:0,inca:0,avocado:0,pumpkin:0,nigella:0,sea:0,other:0};
+
+function sw(btn,name){
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('on');});
+  document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('on');});
+  document.getElementById('pg-'+name).classList.add('on');
+  btn.classList.add('on');
+  if(name==='cost'){syncRef();calcCost();}
+}
+
+// ═══ SVG text 更新工具 ═══
+function setSvg(id,val){var el=document.getElementById(id);if(el)el.textContent=val;}
+
+// ═══ 產量計算 ═══
+function calcProd(){
+  var gW =+document.getElementById('gW').value||0;
+  var gly=+document.getElementById('gly').value;
+  var sor=+document.getElementById('sor').value;
+  var wat=+document.getElementById('wat').value;
+  var sW =+document.getElementById('shW').value||1;
+  var pL =+document.getElementById('pL').value/100;
+  var sc =+document.getElementById('sc').value/100;
+  var rcv=+document.getElementById('rc').value/100;
+
+  // Badge labels
+  document.getElementById('vGly').innerText=gly.toFixed(2);
+  document.getElementById('vSor').innerText=sor.toFixed(2);
+  document.getElementById('vWat').innerText=wat.toFixed(2);
+  document.getElementById('vTpl').innerText=(gly+sor).toFixed(2);
+  document.getElementById('vTw').innerText=wat.toFixed(2);
+  document.getElementById('vPL').innerText=document.getElementById('pL').value+'%';
+  document.getElementById('vSc').innerText=document.getElementById('sc').value+'%';
+  document.getElementById('vRc').innerText=document.getElementById('rc').value+'%';
+
+  // Calculations
+  var tW  = gW*(1+gly+sor+wat);
+  var nW  = tW*(1-pL);
+  var den = 1-(sc*rcv);
+  var eY  = den>0?(1-sc)/den:0;
+  var fSM = nW*eY;
+  var caps= Math.floor((fSM*1000000)/sW);
+
+  // Update data rows
+  document.getElementById('oEY').innerText=(eY*100).toFixed(2);
+  document.getElementById('oFS').innerText=fSM.toFixed(2);
+  document.getElementById('oSW').innerText=sW;
+
+  // ── Update animated flow diagram ──
+  setSvg('fdKg1', gW.toFixed(1)+' kg');
+  setSvg('fdKg2', tW.toFixed(1)+' kg');
+  setSvg('fdKg3', nW.toFixed(1)+' kg');
+  setSvg('fdKg4', fSM.toFixed(1)+' kg');
+  setSvg('fdLossLabel',  '損耗 -'+document.getElementById('pL').value+'%');
+  setSvg('fdScrapLabel', '廢料 -'+document.getElementById('sc').value+'%');
+  setSvg('fdRecovLabel', '回收 +'+document.getElementById('rc').value+'%');
+
+  // Header stats
+  document.getElementById('fdTopCaps').innerText  = caps.toLocaleString('en-US')+' 顆';
+  document.getElementById('fdTopYield').innerText = (eY*100).toFixed(1)+'%';
+  document.getElementById('fdTopShell').innerText = fSM.toFixed(1)+' kg';
+
+  // Meta labels
+  document.getElementById('fdRatioP').innerText = (gly+sor).toFixed(2);
+  document.getElementById('fdRatioW').innerText = wat.toFixed(2);
+  document.getElementById('fdShellWt').innerText= sW;
+
+  // Shared state
+  S.caps=caps; S.gW=gW; S.fSM=fSM; S.glyR=gly; S.sorR=sor;
+  syncRef(); calcCost();
+}
+
+function syncRef(){
+  document.getElementById('cRC').innerText=S.caps.toLocaleString('en-US');
+  document.getElementById('cRG').innerText=S.gW;
+  document.getElementById('cRS').innerText=S.fSM.toFixed(2);
+}
+
+// ═══ 成本計算 ═══
+function calcCost(){
+  var caps=S.caps;
+  if(caps<=0){document.getElementById('cPC').innerText='NT$ —';return;}
+
+  var fP  =+document.getElementById('fP').value||0;
+  var fM  =+document.getElementById('fM').value||0;
+  var fL  =+document.getElementById('fL').value/100;
+  var gP  =+document.getElementById('gP').value||0;
+  var gyP =+document.getElementById('gyP').value||0;
+  var sorP=+document.getElementById('sorP').value||0;
+  var ptpP=+document.getElementById('ptpP').value||0;
+  var bagP=+document.getElementById('bagP').value||0;
+  var bPA =+document.getElementById('boxPA').value||0;
+  var bPC =+document.getElementById('bPC').value||48;
+  var sH  =+document.getElementById('sH').value||0;
+  var mG  =+document.getElementById('mG').value/100;
+
+  // Fixed: 一包3片 = 30顆/盒
+  var capsPerBox = 30;
+  var blisters   = 3;
+
+  // Addon per box
+  var addon=0;
+  if(document.getElementById('adBase').checked)  addon+=(+document.getElementById('prBase').value||0);
+  if(document.getElementById('adLabel').checked) addon+=(+document.getElementById('prLabel').value||0);
+  if(document.getElementById('adDot').checked)   addon+=(+document.getElementById('prDot').value||0)*2;
+  if(document.getElementById('adShrink').checked)addon+=(+document.getElementById('prShrink').value||0);
+
+  // Per-capsule costs
+  var fillCap   = (fM/1000000)*(1+fL)*fP;
+  // Bug fix: 山梨醇成本正確計入（S.sorR × sorP × gW / caps）
+  var shellCap  = (S.gW*gP + S.gW*S.glyR*gyP + S.gW*S.sorR*sorP)/caps;
+  var ptpCap    = ptpP/10;
+  var bagCap    = bagP/10;
+  var boxCap    = (bPA*blisters)/capsPerBox;
+  var addonCap  = addon/capsPerBox;
+  var shipCap   = sH/(bPC*capsPerBox);
+  var tot       = fillCap+shellCap+ptpCap+bagCap+boxCap+addonCap+shipCap;
+
+  var perBox  = tot*capsPerBox;
+  var perCase = perBox*bPC;
+  var sBox    = mG<1 ? Math.round(perBox/(1-mG))  : 0;
+  var sCase   = mG<1 ? Math.round(perCase/(1-mG)) : 0;
+  var mg      = document.getElementById('mG').value;
+
+  document.getElementById('cPC').innerText    ='NT$ '+tot.toFixed(1);
+  document.getElementById('cF').innerText     =fillCap.toFixed(3);
+  document.getElementById('cS').innerText     =shellCap.toFixed(3);
+  document.getElementById('cPtp').innerText   =ptpCap.toFixed(3);
+  document.getElementById('cBag').innerText   =bagCap.toFixed(3);
+  document.getElementById('cBox').innerText   =boxCap.toFixed(3);
+  document.getElementById('cAddon').innerText =addonCap.toFixed(3);
+  document.getElementById('cShip').innerText  =shipCap.toFixed(3);
+  document.getElementById('cPB').innerText    =perBox.toFixed(2);
+  document.getElementById('cPCase').innerText =Math.round(perCase).toLocaleString('en-US');
+  document.getElementById('cCaseDesc').innerText=bPC+' 盒 / 箱';
+  document.getElementById('sPB').innerText    =sBox.toLocaleString('en-US');
+  document.getElementById('sPCase').innerText =sCase.toLocaleString('en-US');
+  document.getElementById('sML').innerText    =mg;
+  document.getElementById('sML2').innerText   =mg;
+  document.getElementById('vFL').innerText    =document.getElementById('fL').value+'%';
+
+  // 逆向定價
+  var tPrice = +document.getElementById('targetPrice').value||0;
+  if(tPrice>0){
+    var revMarginPct = ((tPrice - perBox) / tPrice * 100);
+    var revProfitAmt = tPrice - perBox;
+    document.getElementById('revMargin').innerText  = revMarginPct.toFixed(1)+'%';
+    document.getElementById('revProfit').innerText  = revProfitAmt.toFixed(1);
+  } else {
+    document.getElementById('revMargin').innerText  = '—';
+    document.getElementById('revProfit').innerText  = '—';
+  }
+
+  // 山梨醇警示 badge
+  var sorBadge = document.getElementById('sorWarnBadge');
+  if(sorBadge) sorBadge.style.display = S.sorR > 0 ? 'inline-block' : 'none';
+
+  // ── 批次盈虧 ──
+  var totalBoxes  = Math.floor(caps / capsPerBox);
+  var totalCases  = Math.floor(totalBoxes / bPC);
+  var remBoxes    = totalBoxes % bPC;
+  var batchCostTot= Math.round(tot * caps);
+  var batchRev    = sBox * totalBoxes;
+  var batchProfit = batchRev - batchCostTot;
+  document.getElementById('batchBoxes').innerText    = totalBoxes.toLocaleString('en-US');
+  document.getElementById('batchCases').innerText    = totalCases.toLocaleString('en-US');
+  document.getElementById('batchRem').innerText      = remBoxes > 0 ? '+ '+remBoxes+' 盒散箱' : '';
+  document.getElementById('batchRev').innerText      = batchRev.toLocaleString('en-US');
+  document.getElementById('batchCostTotal').innerText= batchCostTot.toLocaleString('en-US');
+  document.getElementById('batchProfit').innerText   = batchProfit.toLocaleString('en-US');
+  document.getElementById('batchML').innerText       = mg;
+}
+
+// ═══ 季節配方預設 ═══
+var PRESETS = {
+  winter: {
+    gly: 0.40, sor: 0.00, wat: 0.70,
+    note: '高塑化型（High-Plasticizer）— 甘油 0.40，擴大自由體積，抵抗低溫脆性斷裂。<br>適應環境：&lt; 15°C，RH &lt; 30%。<br>代價：乾燥時間長、氧氣阻絕力相對較弱。'
+  },
+  summer: {
+    gly: 0.28, sor: 0.00, wat: 0.68,
+    note: '低塑化型（Low-Plasticizer）—<br>甘油 0.28（範圍 0.25~0.30），防止高溫過度塑化與熱熔合沾黏（Blocking）。<br>阻斷甘油吸收環境水分，維持膠囊外殼機械剛性。<br>適應環境：&gt; 30°C，RH &gt; 70%（台灣夏季潮濕）。'
+  },
+  custom: {
+    gly: null, sor: null, wat: null,
+    note: '自訂配比 — 直接調整下方滑桿，系統即時更新計算結果。'
+  }
+};
+
+function setPreset(name, btn) {
+  document.querySelectorAll('.preset-btn').forEach(function(b){b.classList.remove('on');});
+  btn.classList.add('on');
+  var p = PRESETS[name];
+  if (p.gly !== null) {
+    document.getElementById('gly').value = p.gly;
+    document.getElementById('sor').value = p.sor;
+    document.getElementById('wat').value = p.wat;
+  }
+  document.getElementById('presetNote').innerHTML = p.note;
+  calcProd();
+}
+
+// ═══ 膠皮重建議（依填充量分段線性插值） ═══
+function suggestShell(fillMg) {
+  if (!fillMg || fillMg <= 0) return null;
+  if (fillMg <= 350) return Math.round(250 * fillMg / 350);          // 等比縮小
+  if (fillMg <= 500) return Math.round(250 + (fillMg-350)*(330-250)/(500-350));   // 350→500
+  if (fillMg <= 1000) return Math.round(330 + (fillMg-500)*(550-330)/(1000-500)); // 500→1000
+  return Math.round(550 + (fillMg-1000)*0.28);                        // 超過1000 外插
+}
+function updateShellSuggest() {
+  var fillMg = S.fM || 0;
+  var sg = suggestShell(fillMg);
+  var el  = document.getElementById('shSuggest');
+  var btn = document.getElementById('btnApplySuggest');
+  if (!el) return;
+  if (sg && fillMg > 0) {
+    el.textContent = sg+' mg（填充 '+fillMg+' mg）';
+    if (btn) btn.style.display = 'inline-block';
+  } else {
+    el.textContent = '—';
+    if (btn) btn.style.display = 'none';
+  }
+}
+function applyShellSuggest() {
+  var sg = suggestShell(S.fM);
+  if (sg) { document.getElementById('shW').value = sg; calcProd(); }
+}
+
+// ═══ 填充物切換 ═══
+document.getElementById('fillType').addEventListener('change',function(){
+  var v=this.value;
+  document.getElementById('fillOtherBox').style.display=v==='other'?'block':'none';
+  var def=FILL_PRICES[v];
+  if(def>0) document.getElementById('fP').value=def;
+  calcCost();
+});
+
+// ═══ Excel 匯出 ═══
+function exportExcel(){
+  var wb=XLSX.utils.book_new();
+  var caps=S.caps;
+  var margin=+document.getElementById('mG').value/100;
+  function v(id){return document.getElementById(id)?+document.getElementById(id).value:0;}
+
+  var fillTypeSel=document.getElementById('fillType');
+  var fillName=fillTypeSel.options[fillTypeSel.selectedIndex].text;
+  if(fillTypeSel.value==='other'){var c=document.getElementById('fillOtherName').value;if(c)fillName=c;}
+
+  var today=new Date();
+  var ds=today.getFullYear()+'/'+(today.getMonth()+1)+'/'+today.getDate();
+
+  // Sheet 1: 產量精算
+  var ws1=[
+    ['軟膠囊精算系統 — 產量精算報告'],['匯出日期',ds],[],
+    ['【原料投入】'],['投入明膠粉',v('gW'),'kg'],
+    ['甘油比例',v('gly'),'（基準1）'],['山梨醇比例',v('sor'),'（基準1）'],['水比例',v('wat'),'（基準1）'],[],
+    ['【製程參數】'],['單顆濕膠皮重量',v('shW'),'mg'],
+    ['物理管線損耗率',v('pL'),'%'],['膠網廢料率',v('sc'),'%'],['膠網極限回收率',v('rc'),'%'],[],
+    ['【計算結果】'],
+    ['化膠後濕膠液總重',(v('gW')*(1+v('gly')+v('sor')+v('wat'))).toFixed(2),'kg'],
+    ['有效利用率',document.getElementById('oEY').innerText,'%'],
+    ['實際膠皮總重',document.getElementById('oFS').innerText,'kg'],
+    ['預估總產量',caps,'顆'],
+  ];
+  var s1=XLSX.utils.aoa_to_sheet(ws1);
+  s1['!cols']=[{wch:28},{wch:16},{wch:14}];
+  XLSX.utils.book_append_sheet(wb,s1,'產量精算');
+
+  // Sheet 2: 成本估算
+  var bPC=v('bPC'), sH=v('sH');
+  var addon=0;var aItems=[];
+  if(document.getElementById('adBase').checked){var p=v('prBase');addon+=p;aItems.push(['紙盒加底座',p,'元/盒']);}
+  if(document.getElementById('adLabel').checked){var p=v('prLabel');addon+=p;aItems.push(['貼雷射標貼紙',p,'元/張']);}
+  if(document.getElementById('adDot').checked){var p=v('prDot')*2;addon+=p;aItems.push(['外盒圓點貼紙×2',p,'元/盒']);}
+  if(document.getElementById('adShrink').checked){var p=v('prShrink');addon+=p;aItems.push(['外盒收縮膜',p,'元/盒']);}
+  var fillCap=(v('fM')/1000000)*(1+v('fL')/100)*v('fP');
+  var shellCap=(S.gW*v('gP')+S.gW*S.glyR*v('gyP'))/caps;
+  var ptpCap=v('ptpP')/10, bagCap=v('bagP')/10;
+  var boxCap=(v('boxPA')*3)/30;
+  var addonCap=addon/30;
+  var shipCap=sH/(bPC*30);
+  var tot=fillCap+shellCap+ptpCap+bagCap+boxCap+addonCap+shipCap;
+  var perBox=tot*30, perCase=perBox*bPC;
+  var mg=+document.getElementById('mG').value/100;
+  var sBox=mg<1?Math.round(perBox/(1-mg)):0;
+  var sCase=mg<1?Math.round(perCase/(1-mg)):0;
+
+  var ws2=[
+    ['軟膠囊精算系統 — 成本估算報告'],['匯出日期',ds],[],
+    ['【原料設定】'],
+    ['填充物種類',fillName],['填充物單價',v('fP'),'NT$/kg'],
+    ['每顆填充量',v('fM'),'mg'],['桶底損耗率',v('fL'),'%'],
+    ['Gelita 牛骨膠單價',v('gP'),'NT$/kg'],['甘油單價',v('gyP'),'NT$/kg'],[],
+    ['【包裝設定】'],
+    ['PTP 打片（公版）',v('ptpP'),'NT$/片（10粒/片）'],
+    ['三片入鋁袋+效期打印',v('bagP'),'NT$/片'],
+    ['入盒規格','一包（3片）= 30顆/盒'],
+    ['入盒單價',v('boxPA'),'NT$/片'],[],
+    ['【入盒追加】'],
+  ].concat(aItems.length?aItems:[['（無追加項目）']]).concat([
+    ['追加合計',addon,'NT$/盒'],[],
+    ['每箱盒數',bPC,'盒'],['每箱運費',sH,'NT$'],[],
+    ['【每顆成本明細】'],
+    ['填充物（含損耗）',fillCap.toFixed(4),'NT$/顆'],
+    ['膠皮原料',shellCap.toFixed(4),'NT$/顆'],
+    ['PTP 打片',ptpCap.toFixed(4),'NT$/顆'],
+    ['三片入鋁袋',bagCap.toFixed(4),'NT$/顆'],
+    ['入盒',boxCap.toFixed(4),'NT$/顆'],
+    ['入盒追加',addonCap.toFixed(4),'NT$/顆'],
+    ['運費',shipCap.toFixed(4),'NT$/顆'],
+    ['每顆總成本',tot.toFixed(4),'NT$/顆'],[],
+    ['【成本彙總】'],
+    ['每盒成本（30顆）',perBox.toFixed(2),'NT$'],
+    ['每箱成本（'+bPC+'盒）',perCase.toFixed(2),'NT$'],[],
+    ['【建議售價（毛利'+document.getElementById('mG').value+'%）】'],
+    ['建議零售 / 盒',sBox,'NT$（整數）'],
+    ['建議出貨 / 箱',sCase,'NT$（整數）'],[],
+    ['【批次盈虧試算】'],
+    ['本批次可出盒數',Math.floor(caps/30),'盒'],
+    ['完整箱數',Math.floor(Math.floor(caps/30)/bPC),'箱'],
+    ['預估總收入',sBox*Math.floor(caps/30),'NT$（建議零售×盒數）'],
+    ['批次總成本',Math.round(tot*caps),'NT$'],
+    ['批次毛利',sBox*Math.floor(caps/30)-Math.round(tot*caps),'NT$'],
+    ['毛利率目標',mg<1?(mg*100).toFixed(0)+'%':'—'],
+  ]);
+  var s2=XLSX.utils.aoa_to_sheet(ws2);
+  s2['!cols']=[{wch:30},{wch:16},{wch:20}];
+  XLSX.utils.book_append_sheet(wb,s2,'成本估算');
+
+  XLSX.writeFile(wb,'軟膠囊精算_'+ds.replace(/\//g,'')+'.xlsx');
+}
+
+// ═══ 事件綁定 ═══
+['gW','shW'].forEach(function(id){document.getElementById(id).addEventListener('input',calcProd);});
+// 配比滑桿手動調整 → 切換為自訂模式
+['gly','sor','wat'].forEach(function(id){
+  document.getElementById(id).addEventListener('input',function(){
+    document.querySelectorAll('.preset-btn').forEach(function(b){b.classList.remove('on');});
+    document.getElementById('btnCustom').classList.add('on');
+    document.getElementById('presetNote').innerHTML = PRESETS.custom.note;
+    calcProd();
+  });
+});
+['pL','sc','rc'].forEach(function(id){document.getElementById(id).addEventListener('input',calcProd);});
+['fP','fL','gP','gyP','sorP','ptpP','bagP','boxPA','bPC','sH','mG','targetPrice'].forEach(function(id){document.getElementById(id).addEventListener('input',calcCost);});
+document.getElementById('fM').addEventListener('input',function(){
+  S.fM = +this.value || 0;
+  updateShellSuggest();
+  calcCost();
+});
+['prBase','prLabel','prDot','prShrink'].forEach(function(id){document.getElementById(id).addEventListener('input',calcCost);});
+['adBase','adLabel','adDot','adShrink'].forEach(function(id){document.getElementById(id).addEventListener('change',calcCost);});
+
+S.fM = +document.getElementById('fM').value || 500;
+calcProd();
+updateShellSuggest();
+</script>
+</body>
+</html>
