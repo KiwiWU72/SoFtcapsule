@@ -577,11 +577,11 @@ function renderOilComponents(){
     }
     html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:9px;">';
     html+='<div><div class="lbl" style="font-size:12px;margin-bottom:5px;">用量 (mg / 顆)</div>';
-    html+='<div class="irow"><input type="number" value="'+c.mg+'" min="0" step="10" oninput="oilComponents['+i+'].mg=+this.value;renderOilComponents();calcCost();"><span class="ptag">mg</span></div></div>';
+    html+='<div class="irow"><input type="number" value="'+c.mg+'" min="0" step="10" oninput="oilComponents['+i+'].mg=+this.value;updateOilMgDisplay('+i+');"><span class="ptag">mg</span></div></div>';
     html+='<div><div class="lbl" style="font-size:12px;margin-bottom:5px;">單價 (NT$ / kg)</div>';
     html+='<div class="irow"><span class="ptag">NT$</span><input type="number" value="'+c.price+'" min="0" step="100" oninput="oilComponents['+i+'].price=+this.value;calcCost();"></div></div>';
     html+='</div>';
-    html+='<div style="font-size:11px;color:var(--sl);padding:7px 10px;background:var(--du);border-radius:var(--rf);line-height:1.85;">需求估算：'+demandStr+'</div>';
+    html+='<div id="oilDemandRow_'+i+'" style="font-size:11px;color:var(--sl);padding:7px 10px;background:var(--du);border-radius:var(--rf);line-height:1.85;">需求估算：'+demandStr+'</div>';
     html+='</div>';
   }
   if(oilComponents.length>1){
@@ -592,7 +592,7 @@ function renderOilComponents(){
     var bgColor=ok?'rgba(34,197,94,0.07)':'rgba(220,38,38,0.06)';
     var bdColor=ok?'rgba(34,197,94,0.3)':'rgba(220,38,38,0.3)';
     var txtColor=ok?'#16a34a':'#dc2626';
-    html+='<div style="font-size:14px;margin-bottom:8px;padding:9px 14px;border-radius:var(--rf);background:'+bgColor+';border:1px solid '+bdColor+';display:flex;align-items:center;gap:8px;">';
+    html+='<div id="oilMgBar" style="font-size:14px;margin-bottom:8px;padding:9px 14px;border-radius:var(--rf);background:'+bgColor+';border:1px solid '+bdColor+';display:flex;align-items:center;gap:8px;">';
     html+='<span style="color:var(--sl);">各油品 mg 合計：</span>';
     html+='<strong style="color:'+txtColor+';font-size:15px;">'+totalMg+' mg</strong>';
     if(!ok){
@@ -604,6 +604,36 @@ function renderOilComponents(){
   }
   wrap.innerHTML=html;
   updateOilDemandBanner();
+}
+
+function updateOilMgDisplay(idx){
+  var ci=oilComponents[idx];
+  var caps=S.caps||0;
+  var actualKg=caps*(ci.mg/1000000);
+  var l5=actualKg*1.05,l10=actualKg*1.10;
+  var dEl=document.getElementById('oilDemandRow_'+idx);
+  if(dEl){
+    dEl.innerHTML=caps>0
+      ?'需求估算：實際 <strong style="color:var(--ch);">'+actualKg.toFixed(2)+' kg</strong>\u3000+5%損耗 <strong>'+l5.toFixed(2)+' kg</strong>\u3000+10% <strong>'+l10.toFixed(2)+' kg</strong>'
+      :'需求估算：請先在產量精算頁輸入數據';
+  }
+  if(oilComponents.length>1){
+    var bar=document.getElementById('oilMgBar');
+    if(bar){
+      var totalMg=oilComponents.reduce(function(s,x){return s+x.mg;},0);
+      var fM=S.fM||0,diff=totalMg-fM,ok=Math.abs(diff)<1;
+      var bgC=ok?'rgba(34,197,94,0.07)':'rgba(220,38,38,0.06)';
+      var bdC=ok?'rgba(34,197,94,0.3)':'rgba(220,38,38,0.3)';
+      var txC=ok?'#16a34a':'#dc2626';
+      bar.style.background=bgC;bar.style.borderColor=bdC;
+      bar.innerHTML='<span style="color:var(--sl);">各油品 mg 合計：</span>'
+        +'<strong style="color:'+txC+';font-size:15px;">'+totalMg+' mg</strong>'
+        +(ok?'<span style="color:#22c55e;font-size:15px;font-weight:700;letter-spacing:0.3px;">\u2713 合計正確</span>'
+            :'<span style="color:#ef4444;font-size:13px;font-weight:600;">（與填充量 '+fM+' mg 相差 '+(diff>0?'+':'')+diff.toFixed(0)+' mg）</span>');
+    }
+  }
+  updateOilDemandBanner();
+  calcCost();
 }
 
 function oilTypeChange(idx,val){
