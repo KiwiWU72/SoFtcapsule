@@ -67,11 +67,12 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 .drow .dl{color:var(--sl);}
 .drow .dv{font-weight:600;}
 .drow.hl{background:var(--du);padding:10px 12px;margin:3px -12px;border:none;border-radius:var(--rf);}
-.refbanner{background:var(--card);border:1px solid var(--bd);border-radius:var(--rc);padding:16px 20px;margin-bottom:32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;box-shadow:var(--shadow-card);}
+.refbanner{background:var(--card);border:1px solid var(--bd);border-radius:var(--rc);padding:16px 20px;margin-bottom:32px;display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:10px;box-shadow:var(--shadow-card);}
 .refbanner .rl{font-size:10px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:var(--sl);margin-bottom:3px;}
 .refbanner .rv{font-size:15px;font-weight:600;}
 .refbanner .rm{font-size:12px;color:var(--sl);}
 .cgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px;}
+.cgrid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:8px;}
 .cc{border:1px solid var(--bd);border-radius:var(--rc);padding:18px;background:var(--card);box-shadow:var(--shadow-card);}
 .cc .cl{font-size:10px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:var(--sl);margin-bottom:7px;}
 .cc .cn{font-family:'Cormorant Garamond',Georgia,serif;font-weight:300;font-size:28px;letter-spacing:-.56px;line-height:1.1;}
@@ -111,6 +112,42 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 .shell-ref-row em{font-style:normal;color:var(--sl);opacity:.65;}
 .shell-suggest-row{display:flex;justify-content:space-between;align-items:center;margin-top:7px;padding-top:7px;border-top:1px solid var(--bd);font-size:11px;}
 .shell-suggest-row strong{color:var(--ch);}
+
+/* ── 油品採購費用 ── */
+.oil-proc-box{background:var(--du);border:1px solid var(--bd);border-radius:var(--rf);padding:10px 12px;margin-top:8px;}
+.oil-proc-row{display:flex;justify-content:space-between;align-items:baseline;padding:3px 0;border-bottom:1px solid rgba(0,0,0,0.05);}
+.oil-proc-row:last-child{border-bottom:none;}
+.oil-proc-row.tier-0 .opr-label{font-size:11px;color:var(--sl);}
+.oil-proc-row.tier-0 .opr-val  {font-size:12px;font-weight:600;color:var(--color-gravel);}
+.oil-proc-row.tier-1 .opr-label{font-size:12px;color:var(--color-gravel);}
+.oil-proc-row.tier-1 .opr-val  {font-size:13px;font-weight:600;color:#4a7fbf;}
+.oil-proc-row.tier-2 .opr-label{font-size:13px;color:var(--ch);font-weight:500;}
+.oil-proc-row.tier-2 .opr-val  {font-size:14px;font-weight:700;color:#c05a00;}
+
+/* ── mg 合計置中狀態徽章 ── */
+.mg-ok-bar{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:14px 16px;margin-bottom:10px;text-align:center;
+  border:2px solid rgba(46,204,138,0.3);background:rgba(46,204,138,0.05);
+  border-radius:var(--rf);}
+.mg-ok-bar.err{border-color:rgba(220,38,38,0.3);background:rgba(220,38,38,0.04);}
+.mg-ok-bar .mg-ok-num{font-size:24px;font-weight:700;letter-spacing:-0.5px;margin-bottom:4px;}
+.mg-ok-bar .mg-ok-status{font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px;}
+.mg-ok-bar .mg-ok-sub{font-size:11px;color:var(--sl);margin-top:4px;}
+
+/* ── 代工費滑桿 ── */
+.co-range-wrap{margin-bottom:16px;}
+.co-range-labels{display:flex;justify-content:space-between;font-size:12px;margin-bottom:8px;}
+.co-range-labels .co-min{color:var(--sl);}
+.co-range-labels .co-max{font-weight:600;color:var(--ch);}
+.co-current{text-align:center;margin-top:10px;font-size:13px;color:var(--sl);}
+.co-current strong{font-size:20px;font-weight:600;color:var(--ch);}
+
+/* ── 新增油品按鈕 ── */
+.add-oil-btn{font-family:'Inter',sans-serif;font-size:13px;font-weight:500;
+  padding:9px 18px;border:1px solid var(--bd);border-radius:var(--rp);cursor:pointer;
+  color:var(--sl);background:transparent;transition:all .15s;width:100%;
+  display:flex;align-items:center;justify-content:center;gap:6px;margin:2px 0 14px;}
+.add-oil-btn:hover{background:var(--du);color:var(--ch);}
 </style>
 </head>
 <body>
@@ -293,23 +330,24 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 <div id="pg-cost" class="page">
   <div class="hero">
     <h1>成本估算</h1>
-    <p>原料 → PTP 打片 → 入鋁袋 → 入盒 → 裝箱出貨，全流程成本拆解</p>
+    <p>原料 → 軟膠囊代工 → PTP 打片 → 入鋁袋 → 入盒 → 裝箱出貨，全流程成本拆解</p>
   </div>
 
+  <!-- 參考橫幅：從產量頁帶入 -->
   <div class="refbanner">
     <div>
       <div class="rl">從產量精算帶入</div>
       <div class="rv">本批次 <span id="cRC">0</span> 顆</div>
     </div>
     <div>
-      <div class="rl">明膠</div>
-      <div class="rv" style="font-size:15px;"><span id="cRG">100</span> kg</div>
+      <div class="rl">明膠投入</div>
+      <div class="rv" style="font-size:15px;"><span id="cRG">200</span> kg</div>
       <div class="rm">實際膠皮重 <span id="cRS">0</span> kg</div>
     </div>
     <div>
       <div class="rl">油品需求估算</div>
-      <div class="rv" style="font-size:15px;">實際 <span id="oilDemandActual">—</span> kg</div>
-      <div class="rm">+5%損耗 <span id="oilDemand5">—</span> kg｜+10% <span id="oilDemand10">—</span> kg</div>
+      <div class="rv" style="font-size:14px;">實際 <span id="oilDemandActual">—</span> kg &nbsp;｜ +5% <span id="oilDemand5">—</span> kg &nbsp;｜ +10% <span id="oilDemand10">—</span> kg</div>
+      <div class="rm" style="margin-top:4px;">預估採購費用：<strong id="oilCostActual" style="color:var(--ch);">—</strong> &nbsp;｜ +5% <strong id="oilCost5" style="color:var(--ch);">—</strong> &nbsp;｜ +10% <strong id="oilCost10" style="color:var(--ch);">—</strong></div>
     </div>
   </div>
 
@@ -327,7 +365,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
       <!-- 多油品動態列表 -->
       <div id="oilComponentsWrap"></div>
 
-      <button class="preset-btn" onclick="addOilComponent()" style="width:100%;margin:2px 0 14px;display:flex;align-items:center;justify-content:center;gap:6px;">
+      <button class="add-oil-btn" onclick="addOilComponent()">
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;flex-shrink:0;"><line x1="8" y1="2" x2="8" y2="14"/><line x1="2" y1="8" x2="14" y2="8"/></svg>
         新增油品
       </button>
@@ -338,21 +376,32 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
         <div class="helper">損耗量以各油品單價加權計入成本</div>
       </div>
 
-      <div class="sec">膠皮原料成本</div>
-      <div class="ctl">
-        <div class="lbl">Gelita 牛骨膠單價</div>
-        <div class="irow"><span class="ptag">NT$</span><input type="number" id="gP" value="300" min="0" step="10"><span class="ptag">/ kg</span></div>
-      </div>
-      <div class="ctl">
-        <div class="lbl">甘油單價</div>
-        <div class="irow"><span class="ptag">NT$</span><input type="number" id="gyP" value="120" min="0" step="5"><span class="ptag">/ kg</span></div>
-      </div>
-      <div class="ctl">
-        <div class="lbl">山梨醇單價 (Sorbitol)<span id="sorWarnBadge" style="display:none;font-size:10px;font-weight:500;background:#fff8e1;border:1px solid #f59e0b;color:#92400e;padding:2px 8px;border-radius:9999px;">已啟用 — 計入成本</span></div>
-        <div class="irow"><span class="ptag">NT$</span><input type="number" id="sorP" value="150" min="0" step="5"><span class="ptag">/ kg</span></div>
-        <div class="helper">山梨醇用量由產量頁「配比」決定；若比例為 0 則此欄不影響成本</div>
+      <!-- ── 軟膠囊代工費用 ── -->
+      <div class="sec">軟膠囊代工費用</div>
+      <div class="pb">
+        <div class="pbt">行業代工費用參考範圍</div>
+        <div class="preset-note">含充填、壓合、乾燥、整粒、檢錠等全製程工序；不含原料。<br>實際報價依膠囊大小、配方複雜度、批次量級而異，建議向代工廠確認後填入。</div>
+        <div class="co-range-wrap">
+          <div class="co-range-labels">
+            <span class="co-min">NT$ 0.10 / 顆</span>
+            <span class="co-max">最高 NT$ 5 / 顆</span>
+          </div>
+          <input type="range" id="coFeeRange" value="1.20" min="0.10" max="5" step="0.05"
+                 oninput="syncCoFeeFromRange(this.value)">
+          <div class="co-current">目前設定：<strong id="coFeeDisplay">NT$ 1.20</strong> / 顆</div>
+        </div>
+        <div class="ctl" style="margin-bottom:0;">
+          <div class="lbl" style="margin-bottom:6px;">或直接輸入金額</div>
+          <div class="irow">
+            <span class="ptag">NT$</span>
+            <input type="number" id="coFee" value="1.20" min="0.10" max="5" step="0.05"
+                   oninput="syncCoFeeFromInput(this.value)">
+            <span class="ptag">/ 顆</span>
+          </div>
+        </div>
       </div>
 
+      <!-- ── 入鋁袋 ── -->
       <div class="sec">入鋁袋</div>
       <div class="pb">
         <div class="pbt">每片 PTP = 10 粒膠囊</div>
@@ -366,16 +415,22 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
         </div>
       </div>
 
+      <!-- ── 入盒 ── -->
       <div class="sec">入盒</div>
       <div class="pb">
         <div class="pbt">一包（3片）鋁袋入盒 — 30 顆 / 盒</div>
         <div class="ctl">
-          <div class="lbl">入盒單價</div>
+          <div class="lbl">入盒單價（工序費）</div>
           <div class="irow"><span class="ptag">NT$</span><input type="number" id="boxPA" value="6" min="0" step="0.5"><span class="ptag">/ 片</span></div>
+        </div>
+        <div class="ctl">
+          <div class="lbl">紙盒費用</div>
+          <div class="irow"><span class="ptag">NT$</span><input type="number" id="boxCost" value="10" min="0" step="0.5"><span class="ptag">/ 盒</span></div>
         </div>
         <div class="helper" style="margin-top:0;">每盒 = 3 片 × 10 顆 = 30 顆（固定規格）</div>
       </div>
 
+      <!-- ── 入盒追加 ── -->
       <div class="sec">入盒追加（可單獨勾選取消）</div>
       <div class="pb">
         <div class="adr">
@@ -398,12 +453,27 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
           <span class="adl">外盒收縮膜</span>
           <div class="adp"><span style="font-size:12px;color:var(--sl);">NT$</span><input type="number" id="prShrink" value="5.5" min="0" step="0.5"><span class="adu">/ 盒</span></div>
         </div>
+        <div class="adr">
+          <input type="checkbox" class="addon-cb" id="adInsert">
+          <span class="adl">說明書 / 仿單</span>
+          <div class="adp"><span style="font-size:12px;color:var(--sl);">NT$</span><input type="number" id="prInsert" value="2" min="0" step="0.5"><span class="adu">/ 盒</span></div>
+        </div>
+        <div class="adr">
+          <input type="checkbox" class="addon-cb" id="adDesi">
+          <span class="adl">乾燥劑（1包/盒）</span>
+          <div class="adp"><span style="font-size:12px;color:var(--sl);">NT$</span><input type="number" id="prDesi" value="1" min="0" step="0.5"><span class="adu">/ 包</span></div>
+        </div>
       </div>
 
+      <!-- ── 裝箱 & 運費 ── -->
       <div class="sec">裝箱 &amp; 運費</div>
       <div class="ctl">
         <div class="lbl">每箱盒數</div>
         <div class="irow"><input type="number" id="bPC" value="48" min="1" step="1"><span class="ptag">盒 / 箱</span></div>
+      </div>
+      <div class="ctl">
+        <div class="lbl">紙箱費用</div>
+        <div class="irow"><span class="ptag">NT$</span><input type="number" id="boxCartonCost" value="20" min="0" step="1"><span class="ptag">/ 箱</span></div>
       </div>
       <div class="ctl">
         <div class="lbl">每箱運費</div>
@@ -416,16 +486,18 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
     <div>
       <div class="rh">
         <div class="rl">每顆總成本</div>
-        <div class="rn" id="cPC">NT$ 0.000</div>
-        <div class="ru">含填充物、膠皮、打片、鋁袋、入盒、追加、運費</div>
+        <div class="rn" id="cPC">NT$ —</div>
+        <div class="ru">含填充物、代工費、打片、鋁袋、入盒、追加、紙箱、運費</div>
       </div>
 
       <div class="drow"><span class="dl">填充物（含桶底損耗）</span><strong class="dv">NT$ <span id="cF">0.000</span></strong></div>
-      <div class="drow"><span class="dl">膠皮原料（Gelita + 甘油）</span><strong class="dv">NT$ <span id="cS">0.000</span></strong></div>
+      <div class="drow"><span class="dl">軟膠囊代工費</span><strong class="dv">NT$ <span id="cCo">0.000</span></strong></div>
       <div class="drow"><span class="dl">PTP 打片</span><strong class="dv">NT$ <span id="cPtp">0.000</span></strong></div>
       <div class="drow"><span class="dl">三片入鋁袋 + 效期打印</span><strong class="dv">NT$ <span id="cBag">0.000</span></strong></div>
-      <div class="drow"><span class="dl">入盒（一包3片 = 30顆/盒）</span><strong class="dv">NT$ <span id="cBox">0.000</span></strong></div>
+      <div class="drow"><span class="dl">入盒工序費</span><strong class="dv">NT$ <span id="cBox">0.000</span></strong></div>
+      <div class="drow"><span class="dl">紙盒費用</span><strong class="dv">NT$ <span id="cBoxCost">0.000</span></strong></div>
       <div class="drow"><span class="dl">入盒追加（勾選項目合計）</span><strong class="dv">NT$ <span id="cAddon">0.000</span></strong></div>
+      <div class="drow"><span class="dl">紙箱費用（÷ 箱內顆數）</span><strong class="dv">NT$ <span id="cCarton">0.000</span></strong></div>
       <div class="drow hl"><span class="dl">運費（÷ 箱內顆數）</span><strong class="dv">NT$ <span id="cShip">0.000</span></strong></div>
 
       <div class="cgrid">
@@ -438,6 +510,25 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
           <div class="cl">每箱成本</div>
           <div class="cn">NT$ <span id="cPCase">0.00</span></div>
           <div class="cs"><span id="cCaseDesc">48 盒 / 箱</span></div>
+        </div>
+      </div>
+
+      <div class="sub-hd">代工費區間試算（每盒成本）</div>
+      <div class="cgrid3">
+        <div class="cc">
+          <div class="cl">低 NT$0.8</div>
+          <div class="cn" style="font-size:22px;">NT$ <span id="cPerBoxLow">—</span></div>
+          <div class="cs">每盒成本</div>
+        </div>
+        <div class="cc">
+          <div class="cl">中 NT$1.0</div>
+          <div class="cn" style="font-size:22px;">NT$ <span id="cPerBoxMid">—</span></div>
+          <div class="cs">每盒成本</div>
+        </div>
+        <div class="cc">
+          <div class="cl">上限 NT$5</div>
+          <div class="cn" style="font-size:22px;">NT$ <span id="cPerBoxHigh">—</span></div>
+          <div class="cs">每盒成本</div>
         </div>
       </div>
 
@@ -478,7 +569,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
         <div class="cc">
           <div class="cl">批次總成本</div>
           <div class="cn">NT$ <span id="batchCostTotal">0</span></div>
-          <div class="cs">原料 + 包裝 + 運費合計</div>
+          <div class="cs">原料 + 代工 + 包裝 + 運費合計</div>
         </div>
         <div class="cc dk">
           <div class="cl">批次毛利</div>
@@ -487,7 +578,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
         </div>
       </div>
 
-      <div class="sub-hd" style="border-top-color:var(--bd);">逆向定價推算</div>
+      <div class="sub-hd">逆向定價推算</div>
       <div class="helper" style="margin-bottom:8px;">已知市場終端售價 → 倒推實際毛利率是否達標</div>
       <div class="mrrow">
         <label>市場終端定價 / 盒</label>
@@ -516,7 +607,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
         ▸ 每片 PTP = 10 粒膠囊（固定）<br>
         ▸ 每鋁袋 = 3 片 = 30 顆；一包入盒 = 30顆/盒<br>
         ▸ 桶底損耗以各油品單價加權折算<br>
-        ▸ 膠皮成本根據「產量精算」頁的明膠投入量自動計算
+        ▸ 代工費用行業參考區間：NT$ 0.8 ~ 5 / 顆<br>
+        ▸ 批次顆數由「產量預估」頁自動帶入
       </p>
     </div>
   </div>
@@ -531,6 +623,7 @@ var OIL_LABELS={fish:'魚油',algae:'藻油',inca:'印加果油',avocado:'酪梨
 var OIL_DEFAULT_PRICES={fish:5000,algae:0,inca:0,avocado:0,pumpkin:0,nigella:0,sea:0,other:0};
 var oilComponents=[{type:'fish',customName:'',mg:500,price:5000}];
 
+// ═══ 頁面切換 ═══
 function sw(btn,name){
   document.querySelectorAll('.page').forEach(function(p){p.classList.remove('on');});
   document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('on');});
@@ -542,27 +635,117 @@ function sw(btn,name){
 // ═══ SVG text 更新工具 ═══
 function setSvg(id,val){var el=document.getElementById(id);if(el)el.textContent=val;}
 
-// ═══ 多油品填充管理 ═══
+// ═══ 工具函式 ═══
 function escHtml(s){
   return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
+function fmtNT(n){return 'NT$ '+Math.round(n).toLocaleString('en-US');}
+function setEl(id,val){var e=document.getElementById(id);if(e)e.textContent=val;}
+function getCaps(){return S.caps||0;}
+function getTotalOilMg(){return oilComponents.reduce(function(s,c){return s+c.mg;},0);}
 
+// ═══ 代工費滑桿同步 ═══
+function syncCoFeeFromRange(val){
+  var v=parseFloat(val);
+  document.getElementById('coFee').value=v.toFixed(2);
+  setEl('coFeeDisplay','NT$ '+v.toFixed(2));
+  calcCost();
+}
+function syncCoFeeFromInput(val){
+  var v=parseFloat(val)||0;
+  var clamped=Math.min(Math.max(v,0.10),5);
+  document.getElementById('coFeeRange').value=clamped;
+  setEl('coFeeDisplay','NT$ '+v.toFixed(2));
+  calcCost();
+}
+
+// ═══ 油品採購費用計算 ═══
+function calcOilProcurement(lossRate){
+  var caps=getCaps();
+  return oilComponents.reduce(function(total,c){
+    return total+caps*(c.mg/1000000)*(1+lossRate)*c.price;
+  },0);
+}
+
+function updateOilDemandBanner(){
+  var caps=getCaps();
+  var totalMg=getTotalOilMg();
+  var actualKg=caps*(totalMg/1000000);
+  setEl('oilDemandActual',caps>0?actualKg.toFixed(2):'—');
+  setEl('oilDemand5',     caps>0?(actualKg*1.05).toFixed(2):'—');
+  setEl('oilDemand10',    caps>0?(actualKg*1.10).toFixed(2):'—');
+  setEl('oilCostActual',  caps>0?fmtNT(calcOilProcurement(0)):'—');
+  setEl('oilCost5',       caps>0?fmtNT(calcOilProcurement(0.05)):'—');
+  setEl('oilCost10',      caps>0?fmtNT(calcOilProcurement(0.10)):'—');
+}
+
+// ─── 採購費用三行 HTML ───
+function oilProcRowsHtml(ak,price){
+  return '<div class="oil-proc-row tier-0"><span class="opr-label">實際需求 '+ak.toFixed(2)+' kg</span><span class="opr-val">'+fmtNT(ak*price)+'</span></div>'
+        +'<div class="oil-proc-row tier-1"><span class="opr-label">+5% 損耗 '+(ak*1.05).toFixed(2)+' kg</span><span class="opr-val">'+fmtNT(ak*1.05*price)+'</span></div>'
+        +'<div class="oil-proc-row tier-2"><span class="opr-label">+10% 損耗 '+(ak*1.10).toFixed(2)+' kg</span><span class="opr-val">'+fmtNT(ak*1.10*price)+'</span></div>';
+}
+function oilAllProcRowsHtml(){
+  return '<div class="oil-proc-row tier-0"><span class="opr-label">實際用量</span><span class="opr-val">'+fmtNT(calcOilProcurement(0))+'</span></div>'
+        +'<div class="oil-proc-row tier-1"><span class="opr-label">+5% 損耗</span><span class="opr-val">'+fmtNT(calcOilProcurement(0.05))+'</span></div>'
+        +'<div class="oil-proc-row tier-2"><span class="opr-label">+10% 損耗</span><span class="opr-val">'+fmtNT(calcOilProcurement(0.10))+'</span></div>';
+}
+
+// ═══ 局部更新 — 不重繪整個列表 ═══
+function updateOilProcBox(idx){
+  var box=document.getElementById('oilProcBox_'+idx);
+  if(!box)return;
+  var caps=getCaps();
+  var c=oilComponents[idx];
+  if(caps<=0){box.innerHTML='<div style="color:var(--sl);font-size:11px;">請先在產量精算頁計算批次數量</div>';return;}
+  var ak=caps*(c.mg/1000000);
+  box.innerHTML=oilProcRowsHtml(ak,c.price);
+}
+
+function updateMgTotalBar(){
+  var bar=document.getElementById('oilMgTotalBar');
+  if(!bar)return;
+  var totalMg=getTotalOilMg();
+  var fM=S.fM||0,diff=totalMg-fM,ok=Math.abs(diff)<1;
+  bar.className='mg-ok-bar'+(ok?'':' err');
+  bar.innerHTML=
+    '<div class="mg-ok-num" style="color:'+(ok?'#2ecc8a':'#dc2626')+'">'+totalMg+' mg</div>'
+    +(ok
+      ?'<div class="mg-ok-status" style="color:#16a34a;"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" style="width:15px;height:15px;flex-shrink:0;"><polyline points="3,8 6.5,11.5 13,4.5"/></svg>各油品合計正確，可繼續後續設定</div>'
+      :'<div class="mg-ok-status" style="color:#dc2626;"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" style="width:15px;height:15px;flex-shrink:0;"><line x1="3" y1="3" x2="13" y2="13"/><line x1="13" y1="3" x2="3" y2="13"/></svg>合計與填充量 '+fM+' mg 相差 '+(diff>0?'+':'')+diff.toFixed(0)+' mg</div>')
+    +'<div class="mg-ok-sub">各油品 mg 合計 / 每顆填充量目標</div>';
+}
+
+function updateAllOilsProcBox(){
+  var box=document.getElementById('oilAllProcBox');
+  if(!box)return;
+  var caps=getCaps();
+  if(caps<=0)return;
+  box.innerHTML=
+    '<div style="font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--sl);margin-bottom:8px;">所有油品合計採購費用</div>'
+    +oilAllProcRowsHtml();
+}
+
+// 油品 mg / price 變更 — 局部更新，不重繪整個列表
+function onOilValueChange(idx){
+  updateOilProcBox(idx);
+  if(oilComponents.length>1){updateMgTotalBar();updateAllOilsProcBox();}
+  updateOilDemandBanner();
+  calcCost();
+}
+
+// ═══ 完整重繪油品列表（type 變更、新增、移除時）═══
 function renderOilComponents(){
   var wrap=document.getElementById('oilComponentsWrap');
   if(!wrap)return;
-  var caps=S.caps||0;
+  var caps=getCaps();
   var html='';
+
   for(var i=0;i<oilComponents.length;i++){
     var c=oilComponents[i];
     var selOpts=Object.keys(OIL_LABELS).map(function(k){
       return '<option value="'+k+'"'+(c.type===k?' selected':'')+'>'+OIL_LABELS[k]+'</option>';
     }).join('');
-    var actualKg=caps*(c.mg/1000000);
-    var loss5=actualKg*1.05;
-    var loss10=actualKg*1.10;
-    var demandStr=caps>0
-      ?'實際 <strong style="color:var(--ch);">'+actualKg.toFixed(2)+' kg</strong>　+5%損耗 <strong>'+loss5.toFixed(2)+' kg</strong>　+10% <strong>'+loss10.toFixed(2)+' kg</strong>'
-      :'請先在產量精算頁輸入數據';
 
     html+='<div class="pb" style="margin-bottom:8px;padding:13px 14px 11px;">';
     html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:9px;">';
@@ -575,65 +758,56 @@ function renderOilComponents(){
     if(c.type==='other'){
       html+='<div class="ctl" style="margin-bottom:8px;"><input type="text" placeholder="輸入油品名稱" value="'+escHtml(c.customName)+'" oninput="oilComponents['+i+'].customName=this.value"></div>';
     }
+    // mg + price — oninput 只做局部更新
     html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:9px;">';
     html+='<div><div class="lbl" style="font-size:12px;margin-bottom:5px;">用量 (mg / 顆)</div>';
-    html+='<div class="irow"><input type="number" value="'+c.mg+'" min="0" step="10" oninput="oilComponents['+i+'].mg=+this.value;updateOilMgDisplay('+i+');"><span class="ptag">mg</span></div></div>';
+    html+='<div class="irow"><input type="number" value="'+c.mg+'" min="0" step="10" '
+         +'oninput="oilComponents['+i+'].mg=+this.value;onOilValueChange('+i+');"><span class="ptag">mg</span></div></div>';
     html+='<div><div class="lbl" style="font-size:12px;margin-bottom:5px;">單價 (NT$ / kg)</div>';
-    html+='<div class="irow"><span class="ptag">NT$</span><input type="number" value="'+c.price+'" min="0" step="100" oninput="oilComponents['+i+'].price=+this.value;calcCost();"></div></div>';
+    html+='<div class="irow"><span class="ptag">NT$</span><input type="number" value="'+c.price+'" min="0" step="100" '
+         +'oninput="oilComponents['+i+'].price=+this.value;onOilValueChange('+i+');"></div></div>';
     html+='</div>';
-    html+='<div id="oilDemandRow_'+i+'" style="font-size:11px;color:var(--sl);padding:7px 10px;background:var(--du);border-radius:var(--rf);line-height:1.85;">需求估算：'+demandStr+'</div>';
-    html+='</div>';
-  }
-  if(oilComponents.length>1){
-    var totalMg=oilComponents.reduce(function(s,c){return s+c.mg;},0);
-    var fM=S.fM||0;
-    var diff=totalMg-fM;
-    var ok=Math.abs(diff)<1;
-    var bgColor=ok?'rgba(34,197,94,0.07)':'rgba(220,38,38,0.06)';
-    var bdColor=ok?'rgba(34,197,94,0.3)':'rgba(220,38,38,0.3)';
-    var txtColor=ok?'#16a34a':'#dc2626';
-    html+='<div id="oilMgBar" style="font-size:14px;margin-bottom:8px;padding:9px 14px;border-radius:var(--rf);background:'+bgColor+';border:1px solid '+bdColor+';display:flex;align-items:center;gap:8px;">';
-    html+='<span style="color:var(--sl);">各油品 mg 合計：</span>';
-    html+='<strong style="color:'+txtColor+';font-size:15px;">'+totalMg+' mg</strong>';
-    if(!ok){
-      html+='<span style="color:#ef4444;font-size:13px;font-weight:600;">（與填充量 '+fM+' mg 相差 '+(diff>0?'+':'')+diff.toFixed(0)+' mg）</span>';
-    }else{
-      html+='<span style="color:#22c55e;font-size:15px;font-weight:700;letter-spacing:0.3px;">✓ 合計正確</span>';
+
+    // 採購費用顯示（帶 ID 供局部更新）
+    var ak=caps*(c.mg/1000000);
+    html+='<div class="oil-proc-box" id="oilProcBox_'+i+'">';
+    if(caps>0){
+      html+=oilProcRowsHtml(ak,c.price);
+    } else {
+      html+='<div style="color:var(--sl);font-size:11px;">請先在產量精算頁計算批次數量</div>';
     }
     html+='</div>';
+    html+='</div>';
   }
+
+  // 多油品：mg 合計徽章 + 合計採購費用
+  if(oilComponents.length>1){
+    var totalMg=getTotalOilMg();
+    var fM=S.fM||0,diff=totalMg-fM,ok=Math.abs(diff)<1;
+    html+='<div id="oilMgTotalBar" class="mg-ok-bar'+(ok?'':' err')+'">';
+    html+='<div class="mg-ok-num" style="color:'+(ok?'#2ecc8a':'#dc2626')+'">'+totalMg+' mg</div>';
+    if(ok){
+      html+='<div class="mg-ok-status" style="color:#16a34a;">'
+           +'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" style="width:15px;height:15px;flex-shrink:0;"><polyline points="3,8 6.5,11.5 13,4.5"/></svg>'
+           +'各油品合計正確，可繼續後續設定</div>';
+    } else {
+      html+='<div class="mg-ok-status" style="color:#dc2626;">'
+           +'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" style="width:15px;height:15px;flex-shrink:0;"><line x1="3" y1="3" x2="13" y2="13"/><line x1="13" y1="3" x2="3" y2="13"/></svg>'
+           +'合計與填充量 '+fM+' mg 相差 '+(diff>0?'+':'')+diff.toFixed(0)+' mg</div>';
+    }
+    html+='<div class="mg-ok-sub">各油品 mg 合計 / 每顆填充量目標</div>';
+    html+='</div>';
+
+    if(caps>0){
+      html+='<div class="oil-proc-box" id="oilAllProcBox" style="margin-bottom:12px;">';
+      html+='<div style="font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--sl);margin-bottom:8px;">所有油品合計採購費用</div>';
+      html+=oilAllProcRowsHtml();
+      html+='</div>';
+    }
+  }
+
   wrap.innerHTML=html;
   updateOilDemandBanner();
-}
-
-function updateOilMgDisplay(idx){
-  var ci=oilComponents[idx];
-  var caps=S.caps||0;
-  var actualKg=caps*(ci.mg/1000000);
-  var l5=actualKg*1.05,l10=actualKg*1.10;
-  var dEl=document.getElementById('oilDemandRow_'+idx);
-  if(dEl){
-    dEl.innerHTML=caps>0
-      ?'需求估算：實際 <strong style="color:var(--ch);">'+actualKg.toFixed(2)+' kg</strong>\u3000+5%損耗 <strong>'+l5.toFixed(2)+' kg</strong>\u3000+10% <strong>'+l10.toFixed(2)+' kg</strong>'
-      :'需求估算：請先在產量精算頁輸入數據';
-  }
-  if(oilComponents.length>1){
-    var bar=document.getElementById('oilMgBar');
-    if(bar){
-      var totalMg=oilComponents.reduce(function(s,x){return s+x.mg;},0);
-      var fM=S.fM||0,diff=totalMg-fM,ok=Math.abs(diff)<1;
-      var bgC=ok?'rgba(34,197,94,0.07)':'rgba(220,38,38,0.06)';
-      var bdC=ok?'rgba(34,197,94,0.3)':'rgba(220,38,38,0.3)';
-      var txC=ok?'#16a34a':'#dc2626';
-      bar.style.background=bgC;bar.style.borderColor=bdC;
-      bar.innerHTML='<span style="color:var(--sl);">各油品 mg 合計：</span>'
-        +'<strong style="color:'+txC+';font-size:15px;">'+totalMg+' mg</strong>'
-        +(ok?'<span style="color:#22c55e;font-size:15px;font-weight:700;letter-spacing:0.3px;">\u2713 合計正確</span>'
-            :'<span style="color:#ef4444;font-size:13px;font-weight:600;">（與填充量 '+fM+' mg 相差 '+(diff>0?'+':'')+diff.toFixed(0)+' mg）</span>');
-    }
-  }
-  updateOilDemandBanner();
-  calcCost();
 }
 
 function oilTypeChange(idx,val){
@@ -641,40 +815,23 @@ function oilTypeChange(idx,val){
   if(OIL_DEFAULT_PRICES[val]>0&&oilComponents[idx].price===0){
     oilComponents[idx].price=OIL_DEFAULT_PRICES[val];
   }
-  renderOilComponents();
-  calcCost();
+  renderOilComponents();calcCost();
 }
 function addOilComponent(){
   oilComponents.push({type:'fish',customName:'',mg:0,price:5000});
-  renderOilComponents();
-  calcCost();
+  renderOilComponents();calcCost();
 }
 function removeOilComponent(idx){
   if(oilComponents.length<=1)return;
   oilComponents.splice(idx,1);
-  renderOilComponents();
-  calcCost();
+  renderOilComponents();calcCost();
 }
 function getOilFillCostPerCap(){
   var fLEl=document.getElementById('fL');
   var fL=fLEl?(+fLEl.value/100):0;
-  var total=0;
-  for(var i=0;i<oilComponents.length;i++){
-    var c=oilComponents[i];
-    total+=(c.mg/1000000)*(1+fL)*c.price;
-  }
-  return total;
-}
-function updateOilDemandBanner(){
-  var caps=S.caps||0;
-  var totalMg=oilComponents.reduce(function(s,c){return s+c.mg;},0);
-  var actualKg=caps*(totalMg/1000000);
-  var el1=document.getElementById('oilDemandActual');
-  var el2=document.getElementById('oilDemand5');
-  var el3=document.getElementById('oilDemand10');
-  if(el1)el1.innerText=caps>0?actualKg.toFixed(2):'—';
-  if(el2)el2.innerText=caps>0?(actualKg*1.05).toFixed(2):'—';
-  if(el3)el3.innerText=caps>0?(actualKg*1.10).toFixed(2):'—';
+  return oilComponents.reduce(function(t,c){
+    return t+(c.mg/1000000)*(1+fL)*c.price;
+  },0);
 }
 
 // ═══ 產量計算 ═══
@@ -688,7 +845,6 @@ function calcProd(){
   var sc =+document.getElementById('sc').value/100;
   var rcv=+document.getElementById('rc').value/100;
 
-  // Badge labels
   document.getElementById('vGly').innerText=gly.toFixed(2);
   document.getElementById('vSor').innerText=sor.toFixed(2);
   document.getElementById('vWat').innerText=wat.toFixed(2);
@@ -698,223 +854,198 @@ function calcProd(){
   document.getElementById('vSc').innerText=document.getElementById('sc').value+'%';
   document.getElementById('vRc').innerText=document.getElementById('rc').value+'%';
 
-  // Calculations
-  var tW  = gW*(1+gly+sor+wat);
-  var nW  = tW*(1-pL);
-  var den = 1-(sc*rcv);
-  var eY  = den>0?(1-sc)/den:0;
-  var fSM = nW*eY;
-  var caps= Math.floor((fSM*1000000)/sW);
+  var tW  =gW*(1+gly+sor+wat);
+  var nW  =tW*(1-pL);
+  var den =1-(sc*rcv);
+  var eY  =den>0?(1-sc)/den:0;
+  var fSM =nW*eY;
+  var caps=Math.floor((fSM*1000000)/sW);
 
-  // Update data rows
   document.getElementById('oEY').innerText=(eY*100).toFixed(2);
   document.getElementById('oFS').innerText=fSM.toFixed(2);
   document.getElementById('oSW').innerText=sW;
 
-  // Update animated flow diagram
-  setSvg('fdKg1', gW.toFixed(1)+' kg');
-  setSvg('fdKg2', tW.toFixed(1)+' kg');
-  setSvg('fdKg3', nW.toFixed(1)+' kg');
-  setSvg('fdKg4', fSM.toFixed(1)+' kg');
-  setSvg('fdLossLabel',  '損耗 -'+document.getElementById('pL').value+'%');
-  setSvg('fdScrapLabel', '廢料 -'+document.getElementById('sc').value+'%');
-  setSvg('fdRecovLabel', '回收 +'+document.getElementById('rc').value+'%');
+  setSvg('fdKg1',gW.toFixed(1)+' kg');
+  setSvg('fdKg2',tW.toFixed(1)+' kg');
+  setSvg('fdKg3',nW.toFixed(1)+' kg');
+  setSvg('fdKg4',fSM.toFixed(1)+' kg');
+  setSvg('fdLossLabel','損耗 -'+document.getElementById('pL').value+'%');
+  setSvg('fdScrapLabel','廢料 -'+document.getElementById('sc').value+'%');
+  setSvg('fdRecovLabel','回收 +'+document.getElementById('rc').value+'%');
 
-  // Header stats
-  document.getElementById('fdTopCaps').innerText  = caps.toLocaleString('en-US')+' 顆';
-  document.getElementById('fdTopYield').innerText = (eY*100).toFixed(1)+'%';
-  document.getElementById('fdTopShell').innerText = fSM.toFixed(1)+' kg';
+  document.getElementById('fdTopCaps').innerText=caps.toLocaleString('en-US')+' 顆';
+  document.getElementById('fdTopYield').innerText=(eY*100).toFixed(1)+'%';
+  document.getElementById('fdTopShell').innerText=fSM.toFixed(1)+' kg';
 
-  // Meta labels
-  document.getElementById('fdRatioP').innerText = (gly+sor).toFixed(2);
-  document.getElementById('fdRatioW').innerText = wat.toFixed(2);
-  document.getElementById('fdShellWt').innerText= sW;
+  document.getElementById('fdRatioP').innerText=(gly+sor).toFixed(2);
+  document.getElementById('fdRatioW').innerText=wat.toFixed(2);
+  document.getElementById('fdShellWt').innerText=sW;
 
-  // Shared state
-  S.caps=caps; S.gW=gW; S.fSM=fSM; S.glyR=gly; S.sorR=sor;
+  S.caps=caps;S.gW=gW;S.fSM=fSM;S.glyR=gly;S.sorR=sor;
   syncRef();
   updateOilDemandBanner();
   calcCost();
 }
 
 function syncRef(){
-  document.getElementById('cRC').innerText=S.caps.toLocaleString('en-US');
-  document.getElementById('cRG').innerText=S.gW;
-  document.getElementById('cRS').innerText=S.fSM.toFixed(2);
+  setEl('cRC',S.caps.toLocaleString('en-US'));
+  setEl('cRG',S.gW);
+  setEl('cRS',S.fSM.toFixed(2));
 }
 
 // ═══ 成本計算 ═══
 function calcCost(){
   var caps=S.caps;
-  if(caps<=0){document.getElementById('cPC').innerText='NT$ —';return;}
+  if(caps<=0){setEl('cPC','NT$ —');return;}
 
-  var fM  =+document.getElementById('fM').value||0;
-  var fL  =+document.getElementById('fL').value/100;
-  var gP  =+document.getElementById('gP').value||0;
-  var gyP =+document.getElementById('gyP').value||0;
-  var sorP=+document.getElementById('sorP').value||0;
-  var ptpP=+document.getElementById('ptpP').value||0;
-  var bagP=+document.getElementById('bagP').value||0;
-  var bPA =+document.getElementById('boxPA').value||0;
-  var bPC =+document.getElementById('bPC').value||48;
-  var sH  =+document.getElementById('sH').value||0;
-  var mG  =+document.getElementById('mG').value/100;
+  S.fM=+document.getElementById('fM').value||0;
 
-  var capsPerBox = 30;
-  var blisters   = 3;
+  var coFee         =+document.getElementById('coFee').value         ||0;
+  var ptpP          =+document.getElementById('ptpP').value          ||0;
+  var bagP          =+document.getElementById('bagP').value          ||0;
+  var bPA           =+document.getElementById('boxPA').value         ||0;
+  var boxCostV      =+document.getElementById('boxCost').value       ||0;
+  var bPC           =+document.getElementById('bPC').value           ||48;
+  var boxCartonCostV=+document.getElementById('boxCartonCost').value ||0;
+  var sH            =+document.getElementById('sH').value            ||0;
+  var mG            =+document.getElementById('mG').value/100;
+
+  var capsPerBox=30, blisters=3;
 
   var addon=0;
-  if(document.getElementById('adBase').checked)  addon+=(+document.getElementById('prBase').value||0);
-  if(document.getElementById('adLabel').checked) addon+=(+document.getElementById('prLabel').value||0);
-  if(document.getElementById('adDot').checked)   addon+=(+document.getElementById('prDot').value||0)*2;
-  if(document.getElementById('adShrink').checked)addon+=(+document.getElementById('prShrink').value||0);
+  if(document.getElementById('adBase').checked)   addon+=(+document.getElementById('prBase').value  ||0);
+  if(document.getElementById('adLabel').checked)  addon+=(+document.getElementById('prLabel').value ||0);
+  if(document.getElementById('adDot').checked)    addon+=(+document.getElementById('prDot').value   ||0)*2;
+  if(document.getElementById('adShrink').checked) addon+=(+document.getElementById('prShrink').value||0);
+  if(document.getElementById('adInsert').checked) addon+=(+document.getElementById('prInsert').value||0);
+  if(document.getElementById('adDesi').checked)   addon+=(+document.getElementById('prDesi').value  ||0);
 
-  var fillCap   = getOilFillCostPerCap();
-  var shellCap  = (S.gW*gP + S.gW*S.glyR*gyP + S.gW*S.sorR*sorP)/caps;
-  var ptpCap    = ptpP/10;
-  var bagCap    = bagP/10;
-  var boxCap    = (bPA*blisters)/capsPerBox;
-  var addonCap  = addon/capsPerBox;
-  var shipCap   = sH/(bPC*capsPerBox);
-  var tot       = fillCap+shellCap+ptpCap+bagCap+boxCap+addonCap+shipCap;
+  var fillCap        =getOilFillCostPerCap();
+  var coCap          =coFee;
+  var ptpCap         =ptpP/10;
+  var bagCap         =bagP/10;
+  var boxCap         =(bPA*blisters)/capsPerBox;
+  var boxCostCap     =boxCostV/capsPerBox;
+  var addonCap       =addon/capsPerBox;
+  var cartonCap      =boxCartonCostV/(bPC*capsPerBox);
+  var shipCap        =sH/(bPC*capsPerBox);
+  var tot            =fillCap+coCap+ptpCap+bagCap+boxCap+boxCostCap+addonCap+cartonCap+shipCap;
 
-  var perBox  = tot*capsPerBox;
-  var perCase = perBox*bPC;
-  var sBox    = mG<1 ? Math.round(perBox/(1-mG))  : 0;
-  var sCase   = mG<1 ? Math.round(perCase/(1-mG)) : 0;
-  var mg      = document.getElementById('mG').value;
+  var perBox =tot*capsPerBox;
+  var perCase=perBox*bPC;
+  var sBox   =mG<1?Math.round(perBox/(1-mG)):0;
+  var sCase  =mG<1?Math.round(perCase/(1-mG)):0;
+  var mg     =document.getElementById('mG').value;
 
-  document.getElementById('cPC').innerText    ='NT$ '+tot.toFixed(1);
-  document.getElementById('cF').innerText     =fillCap.toFixed(3);
-  document.getElementById('cS').innerText     =shellCap.toFixed(3);
-  document.getElementById('cPtp').innerText   =ptpCap.toFixed(3);
-  document.getElementById('cBag').innerText   =bagCap.toFixed(3);
-  document.getElementById('cBox').innerText   =boxCap.toFixed(3);
-  document.getElementById('cAddon').innerText =addonCap.toFixed(3);
-  document.getElementById('cShip').innerText  =shipCap.toFixed(3);
-  document.getElementById('cPB').innerText    =perBox.toFixed(2);
-  document.getElementById('cPCase').innerText =Math.round(perCase).toLocaleString('en-US');
-  document.getElementById('cCaseDesc').innerText=bPC+' 盒 / 箱';
-  document.getElementById('sPB').innerText    =sBox.toLocaleString('en-US');
-  document.getElementById('sPCase').innerText =sCase.toLocaleString('en-US');
-  document.getElementById('sML').innerText    =mg;
-  document.getElementById('sML2').innerText   =mg;
-  document.getElementById('vFL').innerText    =document.getElementById('fL').value+'%';
+  // 代工費區間試算
+  var base=fillCap+ptpCap+bagCap+boxCap+boxCostCap+addonCap+cartonCap+shipCap;
+  setEl('cPerBoxLow', ((base+0.8)*capsPerBox).toFixed(1));
+  setEl('cPerBoxMid', ((base+1.0)*capsPerBox).toFixed(1));
+  setEl('cPerBoxHigh',((base+5.0)*capsPerBox).toFixed(1));
 
-  var tPrice = +document.getElementById('targetPrice').value||0;
+  setEl('cPC',   'NT$ '+tot.toFixed(1));
+  setEl('cF',    fillCap.toFixed(3));
+  setEl('cCo',   coCap.toFixed(3));
+  setEl('cPtp',  ptpCap.toFixed(3));
+  setEl('cBag',  bagCap.toFixed(3));
+  setEl('cBox',      boxCap.toFixed(3));
+  setEl('cBoxCost',  boxCostCap.toFixed(3));
+  setEl('cAddon',    addonCap.toFixed(3));
+  setEl('cCarton',   cartonCap.toFixed(3));
+  setEl('cShip',     shipCap.toFixed(3));
+  setEl('cPB',   perBox.toFixed(2));
+  setEl('cPCase',Math.round(perCase).toLocaleString('en-US'));
+  setEl('cCaseDesc',bPC+' 盒 / 箱');
+  setEl('sPB',   sBox.toLocaleString('en-US'));
+  setEl('sPCase',sCase.toLocaleString('en-US'));
+  setEl('sML',   mg); setEl('sML2',mg);
+  setEl('vFL',   document.getElementById('fL').value+'%');
+
+  // 逆向定價
+  var tPrice=+document.getElementById('targetPrice').value||0;
   if(tPrice>0){
-    var revMarginPct = ((tPrice - perBox) / tPrice * 100);
-    var revProfitAmt = tPrice - perBox;
-    document.getElementById('revMargin').innerText  = revMarginPct.toFixed(1)+'%';
-    document.getElementById('revProfit').innerText  = revProfitAmt.toFixed(1);
+    setEl('revMargin',((tPrice-perBox)/tPrice*100).toFixed(1)+'%');
+    setEl('revProfit',(tPrice-perBox).toFixed(1));
   } else {
-    document.getElementById('revMargin').innerText  = '—';
-    document.getElementById('revProfit').innerText  = '—';
+    setEl('revMargin','—');setEl('revProfit','—');
   }
 
-  var sorBadge = document.getElementById('sorWarnBadge');
-  if(sorBadge) sorBadge.style.display = S.sorR > 0 ? 'inline-block' : 'none';
-
-  var totalBoxes  = Math.floor(caps / capsPerBox);
-  var totalCases  = Math.floor(totalBoxes / bPC);
-  var remBoxes    = totalBoxes % bPC;
-  var batchCostTot= Math.round(tot * caps);
-  var batchRev    = sBox * totalBoxes;
-  var batchProfit = batchRev - batchCostTot;
-  document.getElementById('batchBoxes').innerText    = totalBoxes.toLocaleString('en-US');
-  document.getElementById('batchCases').innerText    = totalCases.toLocaleString('en-US');
-  document.getElementById('batchRem').innerText      = remBoxes > 0 ? '+ '+remBoxes+' 盒散箱' : '';
-  document.getElementById('batchRev').innerText      = batchRev.toLocaleString('en-US');
-  document.getElementById('batchCostTotal').innerText= batchCostTot.toLocaleString('en-US');
-  document.getElementById('batchProfit').innerText   = batchProfit.toLocaleString('en-US');
-  document.getElementById('batchML').innerText       = mg;
+  // 批次盈虧
+  var totalBoxes  =Math.floor(caps/capsPerBox);
+  var totalCases  =Math.floor(totalBoxes/bPC);
+  var remBoxes    =totalBoxes%bPC;
+  var batchCostTot=Math.round(tot*caps);
+  var batchRevTot =sBox*totalBoxes;
+  setEl('batchBoxes',    totalBoxes.toLocaleString('en-US'));
+  setEl('batchCases',    totalCases.toLocaleString('en-US'));
+  setEl('batchRem',      remBoxes>0?'+ '+remBoxes+' 盒散箱':'');
+  setEl('batchRev',      batchRevTot.toLocaleString('en-US'));
+  setEl('batchCostTotal',batchCostTot.toLocaleString('en-US'));
+  setEl('batchProfit',   (batchRevTot-batchCostTot).toLocaleString('en-US'));
+  setEl('batchML',       mg);
 }
 
 // ═══ 季節配方預設 ═══
-var PRESETS = {
-  winter: {
-    gly: 0.40, sor: 0.00, wat: 0.70,
-    note: '高塑化型（High-Plasticizer）— 甘油 0.40，擴大自由體積，抵抗低溫脆性斷裂。<br>適應環境：&lt; 15°C，RH &lt; 30%。<br>代價：乾燥時間長、氧氣阻絕力相對較弱。'
-  },
-  summer: {
-    gly: 0.28, sor: 0.00, wat: 0.68,
-    note: '低塑化型（Low-Plasticizer）—<br>甘油 0.28（範圍 0.25~0.30），防止高溫過度塑化與熱熔合沾黏（Blocking）。<br>阻斷甘油吸收環境水分，維持膠囊外殼機械剛性。<br>適應環境：&gt; 30°C，RH &gt; 70%（台灣夏季潮濕）。'
-  },
-  custom: {
-    gly: null, sor: null, wat: null,
-    note: '自訂配比 — 直接調整下方滑桿，系統即時更新計算結果。'
-  }
+var PRESETS={
+  winter:{gly:0.40,sor:0.00,wat:0.70,
+    note:'高塑化型（High-Plasticizer）— 甘油 0.40，擴大自由體積，抵抗低溫脆性斷裂。<br>適應環境：&lt; 15°C，RH &lt; 30%。<br>代價：乾燥時間長、氧氣阻絕力相對較弱。'},
+  summer:{gly:0.28,sor:0.00,wat:0.68,
+    note:'低塑化型（Low-Plasticizer）—<br>甘油 0.28（範圍 0.25~0.30），防止高溫過度塑化與熱熔合沾黏（Blocking）。<br>阻斷甘油吸收環境水分，維持膠囊外殼機械剛性。<br>適應環境：&gt; 30°C，RH &gt; 70%（台灣夏季潮濕）。'},
+  custom:{gly:null,sor:null,wat:null,
+    note:'自訂配比 — 直接調整下方滑桿，系統即時更新計算結果。'}
 };
 
-function setPreset(name, btn) {
+function setPreset(name,btn){
   document.querySelectorAll('.preset-btn').forEach(function(b){b.classList.remove('on');});
   btn.classList.add('on');
-  var p = PRESETS[name];
-  if (p.gly !== null) {
-    document.getElementById('gly').value = p.gly;
-    document.getElementById('sor').value = p.sor;
-    document.getElementById('wat').value = p.wat;
+  var p=PRESETS[name];
+  if(p.gly!==null){
+    document.getElementById('gly').value=p.gly;
+    document.getElementById('sor').value=p.sor;
+    document.getElementById('wat').value=p.wat;
   }
-  document.getElementById('presetNote').innerHTML = p.note;
+  document.getElementById('presetNote').innerHTML=p.note;
   calcProd();
 }
 
 // ═══ 膠皮重建議 ═══
-function suggestShell(fillMg) {
-  if (!fillMg || fillMg <= 0) return null;
-  if (fillMg <= 350) return Math.round(250 * fillMg / 350);
-  if (fillMg <= 500) return Math.round(250 + (fillMg-350)*(330-250)/(500-350));
-  if (fillMg <= 1000) return Math.round(330 + (fillMg-500)*(550-330)/(1000-500));
-  return Math.round(550 + (fillMg-1000)*0.28);
+function suggestShell(fillMg){
+  if(!fillMg||fillMg<=0)return null;
+  if(fillMg<=350)return Math.round(250*fillMg/350);
+  if(fillMg<=500)return Math.round(250+(fillMg-350)*(330-250)/(500-350));
+  if(fillMg<=1000)return Math.round(330+(fillMg-500)*(550-330)/(1000-500));
+  return Math.round(550+(fillMg-1000)*0.28);
 }
-function updateShellSuggest() {
-  var fillMg = S.fM || 0;
-  var sg = suggestShell(fillMg);
-  var el  = document.getElementById('shSuggest');
-  var btn = document.getElementById('btnApplySuggest');
-  if (!el) return;
-  if (sg && fillMg > 0) {
-    el.textContent = sg+' mg（填充 '+fillMg+' mg）';
-    if (btn) btn.style.display = 'inline-block';
+function updateShellSuggest(){
+  var fillMg=S.fM||0;
+  var sg=suggestShell(fillMg);
+  var el=document.getElementById('shSuggest');
+  var btn=document.getElementById('btnApplySuggest');
+  if(!el)return;
+  if(sg&&fillMg>0){
+    el.textContent=sg+' mg（填充 '+fillMg+' mg）';
+    if(btn)btn.style.display='inline-block';
   } else {
-    el.textContent = '—';
-    if (btn) btn.style.display = 'none';
+    el.textContent='—';
+    if(btn)btn.style.display='none';
   }
 }
-function applyShellSuggest() {
-  var sg = suggestShell(S.fM);
-  if (sg) { document.getElementById('shW').value = sg; calcProd(); }
+function applyShellSuggest(){
+  var sg=suggestShell(S.fM);
+  if(sg){document.getElementById('shW').value=sg;calcProd();}
 }
 
 // ═══ Excel 匯出 ═══
 function exportExcel(){
   var wb=XLSX.utils.book_new();
   var caps=S.caps;
+  var coFee=+document.getElementById('coFee').value||0;
   var margin=+document.getElementById('mG').value/100;
   function v(id){return document.getElementById(id)?+document.getElementById(id).value:0;}
-
-  var fillRows=[];
-  oilComponents.forEach(function(c,i){
-    var label=c.type==='other'?(c.customName||'自填油品'):OIL_LABELS[c.type];
-    var actualKg=caps>0?(caps*(c.mg/1000000)):0;
-    var kg5=actualKg*1.05, kg10=actualKg*1.10;
-    fillRows.push(['油品#'+(i+1)+' '+label+' — 配方', c.mg, 'mg/顆，單價 NT$'+c.price+'/kg']);
-    fillRows.push(['　 需求（實際）', actualKg.toFixed(2), 'kg']);
-    fillRows.push(['　 需求（+5%損耗）', kg5.toFixed(2), 'kg']);
-    fillRows.push(['　 需求（+10%損耗）', kg10.toFixed(2), 'kg']);
-  });
-  var totalMgEx=oilComponents.reduce(function(s,c){return s+c.mg;},0);
-  var totalActKg=caps>0?(caps*(totalMgEx/1000000)):0;
-  fillRows.push([]);
-  fillRows.push(['【合計需求估算】', '', '']);
-  fillRows.push(['　 實際', totalActKg.toFixed(2), 'kg']);
-  fillRows.push(['　 +5%損耗', (totalActKg*1.05).toFixed(2), 'kg']);
-  fillRows.push(['　 +10%損耗', (totalActKg*1.10).toFixed(2), 'kg']);
-
   var today=new Date();
   var ds=today.getFullYear()+'/'+(today.getMonth()+1)+'/'+today.getDate();
 
-  // Sheet 1
+  // Sheet 1 — 產量精算
   var ws1=[
     ['軟膠囊精算系統 — 產量精算報告'],['匯出日期',ds],[],
     ['【原料投入】'],['投入明膠粉',v('gW'),'kg'],
@@ -931,66 +1062,93 @@ function exportExcel(){
   s1['!cols']=[{wch:28},{wch:16},{wch:14}];
   XLSX.utils.book_append_sheet(wb,s1,'產量精算');
 
-  // Sheet 2
-  var bPC2=v('bPC'), sH2=v('sH');
-  var addon=0; var aItems=[];
-  if(document.getElementById('adBase').checked){var p=v('prBase');addon+=p;aItems.push(['紙盒加底座',p,'元/盒']);}
-  if(document.getElementById('adLabel').checked){var p=v('prLabel');addon+=p;aItems.push(['貼雷射標貼紙',p,'元/張']);}
-  if(document.getElementById('adDot').checked){var p=v('prDot')*2;addon+=p;aItems.push(['外盒圓點貼紙x2',p,'元/盒']);}
-  if(document.getElementById('adShrink').checked){var p=v('prShrink');addon+=p;aItems.push(['外盒收縮膜',p,'元/盒']);}
-  var fillCap2=getOilFillCostPerCap();
-  var shellCap2=(S.gW*v('gP')+S.gW*S.glyR*v('gyP')+S.gW*S.sorR*v('sorP'))/caps;
-  var ptpCap2=v('ptpP')/10, bagCap2=v('bagP')/10;
-  var boxCap2=(v('boxPA')*3)/30;
-  var addonCap2=addon/30;
-  var shipCap2=sH2/(bPC2*30);
-  var tot2=fillCap2+shellCap2+ptpCap2+bagCap2+boxCap2+addonCap2+shipCap2;
-  var perBox2=tot2*30, perCase2=perBox2*bPC2;
+  // Sheet 2 — 成本估算
+  var oilRows=[];
+  oilComponents.forEach(function(c,i){
+    var label=c.type==='other'?(c.customName||'自填油品'):OIL_LABELS[c.type];
+    var actualKg=caps>0?(caps*(c.mg/1000000)):0;
+    oilRows.push(['油品 #'+(i+1)+' '+label,c.mg,'mg/顆　單價 NT$'+c.price+'/kg']);
+    oilRows.push(['　 需求（實際）',actualKg.toFixed(2),'kg　≒ NT$'+Math.round(actualKg*c.price).toLocaleString('en-US')]);
+    oilRows.push(['　 需求（+5%損耗）',(actualKg*1.05).toFixed(2),'kg　≒ NT$'+Math.round(actualKg*1.05*c.price).toLocaleString('en-US')]);
+    oilRows.push(['　 需求（+10%損耗）',(actualKg*1.10).toFixed(2),'kg　≒ NT$'+Math.round(actualKg*1.10*c.price).toLocaleString('en-US')]);
+    oilRows.push([]);
+  });
+
+  var bPC2=v('bPC'),sH2=v('sH'),carton2=v('boxCartonCost');
+  var addon=0;var aItems=[];
+  if(document.getElementById('adBase').checked)   {var p=v('prBase');  addon+=p;aItems.push(['紙盒加底座',p,'元/盒']);}
+  if(document.getElementById('adLabel').checked)  {var p=v('prLabel'); addon+=p;aItems.push(['貼雷射標貼紙',p,'元/張']);}
+  if(document.getElementById('adDot').checked)    {var p=v('prDot')*2; addon+=p;aItems.push(['外盒圓點貼紙x2',p,'元/盒']);}
+  if(document.getElementById('adShrink').checked) {var p=v('prShrink');addon+=p;aItems.push(['外盒收縮膜',p,'元/盒']);}
+  if(document.getElementById('adInsert').checked) {var p=v('prInsert');addon+=p;aItems.push(['說明書/仿單',p,'元/盒']);}
+  if(document.getElementById('adDesi').checked)   {var p=v('prDesi');  addon+=p;aItems.push(['乾燥劑',p,'元/包']);}
+
+  var fillCap2    =getOilFillCostPerCap();
+  var ptpCap2     =v('ptpP')/10;
+  var bagCap2     =v('bagP')/10;
+  var boxCap2     =(v('boxPA')*3)/30;
+  var boxCostCap2 =v('boxCost')/30;
+  var addonCap2   =addon/30;
+  var cartonCap2  =carton2/(bPC2*30);
+  var shipCap2    =sH2/(bPC2*30);
+  var tot2=fillCap2+coFee+ptpCap2+bagCap2+boxCap2+boxCostCap2+addonCap2+cartonCap2+shipCap2;
+  var perBox2=tot2*30,perCase2=perBox2*bPC2;
   var mg2=+document.getElementById('mG').value/100;
   var sBox2=mg2<1?Math.round(perBox2/(1-mg2)):0;
   var sCase2=mg2<1?Math.round(perCase2/(1-mg2)):0;
+  var base2=fillCap2+ptpCap2+bagCap2+boxCap2+boxCostCap2+addonCap2+cartonCap2+shipCap2;
 
   var ws2=[
     ['軟膠囊精算系統 — 成本估算報告'],['匯出日期',ds],[],
+    ['【批次規模（來自產量精算）】'],['本批次數量',caps,'顆'],[],
     ['【填充物設定】'],
     ['每顆填充量合計',v('fM'),'mg'],['桶底損耗率',v('fL'),'%'],
-  ].concat(fillRows).concat([
-    [],[' 膠皮原料成本'],
-    ['Gelita 牛骨膠單價',v('gP'),'NT$/kg'],['甘油單價',v('gyP'),'NT$/kg'],['山梨醇單價',v('sorP'),'NT$/kg'],[],
+  ].concat(oilRows).concat([
+    ['【軟膠囊代工費用】'],
+    ['代工費（每顆）',coFee,'NT$/顆'],
+    ['行業參考區間','0.8 ~ 5','NT$/顆'],[],
     ['【包裝設定】'],
-    ['PTP 打片（公版）',v('ptpP'),'NT$/片（10粒/片）'],
+    ['PTP 打片',v('ptpP'),'NT$/片（10粒/片）'],
     ['三片入鋁袋+效期打印',v('bagP'),'NT$/片'],
     ['入盒規格','一包（3片）= 30顆/盒'],
-    ['入盒單價',v('boxPA'),'NT$/片'],[],
+    ['入盒工序費',v('boxPA'),'NT$/片'],
+    ['紙盒費用',v('boxCost'),'NT$/盒'],
+    ['紙箱費用',v('boxCartonCost'),'NT$/箱'],[],
     ['【入盒追加】'],
-  ].concat(aItems.length?aItems:[['（無追加項目）']]).concat([
+  ]).concat(aItems.length?aItems:[['（無追加項目）']]).concat([
     ['追加合計',addon,'NT$/盒'],[],
     ['每箱盒數',bPC2,'盒'],['每箱運費',sH2,'NT$'],[],
     ['【每顆成本明細】'],
     ['填充物（含損耗）',fillCap2.toFixed(4),'NT$/顆'],
-    ['膠皮原料',shellCap2.toFixed(4),'NT$/顆'],
+    ['軟膠囊代工費',coFee.toFixed(4),'NT$/顆'],
     ['PTP 打片',ptpCap2.toFixed(4),'NT$/顆'],
     ['三片入鋁袋',bagCap2.toFixed(4),'NT$/顆'],
-    ['入盒',boxCap2.toFixed(4),'NT$/顆'],
+    ['入盒工序費',boxCap2.toFixed(4),'NT$/顆'],
+    ['紙盒費用',boxCostCap2.toFixed(4),'NT$/顆'],
     ['入盒追加',addonCap2.toFixed(4),'NT$/顆'],
+    ['紙箱費用',cartonCap2.toFixed(4),'NT$/顆'],
     ['運費',shipCap2.toFixed(4),'NT$/顆'],
     ['每顆總成本',tot2.toFixed(4),'NT$/顆'],[],
     ['【成本彙總】'],
     ['每盒成本（30顆）',perBox2.toFixed(2),'NT$'],
     ['每箱成本（'+bPC2+'盒）',perCase2.toFixed(2),'NT$'],[],
+    ['【代工費區間試算（每盒成本）】'],
+    ['代工 NT$0.8/顆',((base2+0.8)*30).toFixed(2),'NT$'],
+    ['代工 NT$1.0/顆',((base2+1.0)*30).toFixed(2),'NT$'],
+    ['代工 NT$5.0/顆',((base2+5.0)*30).toFixed(2),'NT$（上限）'],[],
     ['【建議售價（毛利'+document.getElementById('mG').value+'%）】'],
     ['建議零售 / 盒',sBox2,'NT$（整數）'],
     ['建議出貨 / 箱',sCase2,'NT$（整數）'],[],
     ['【批次盈虧試算】'],
     ['本批次可出盒數',Math.floor(caps/30),'盒'],
     ['完整箱數',Math.floor(Math.floor(caps/30)/bPC2),'箱'],
-    ['預估總收入',sBox2*Math.floor(caps/30),'NT$（建議零售x盒數）'],
+    ['預估總收入',sBox2*Math.floor(caps/30),'NT$（建議零售×盒數）'],
     ['批次總成本',Math.round(tot2*caps),'NT$'],
     ['批次毛利',sBox2*Math.floor(caps/30)-Math.round(tot2*caps),'NT$'],
     ['毛利率目標',mg2<1?(mg2*100).toFixed(0)+'%':'—'],
-  ]));
+  ]);
   var s2=XLSX.utils.aoa_to_sheet(ws2);
-  s2['!cols']=[{wch:30},{wch:16},{wch:20}];
+  s2['!cols']=[{wch:32},{wch:18},{wch:22}];
   XLSX.utils.book_append_sheet(wb,s2,'成本估算');
 
   XLSX.writeFile(wb,'軟膠囊精算_'+ds.replace(/\//g,'')+'.xlsx');
@@ -1002,25 +1160,25 @@ function exportExcel(){
   document.getElementById(id).addEventListener('input',function(){
     document.querySelectorAll('.preset-btn').forEach(function(b){b.classList.remove('on');});
     document.getElementById('btnCustom').classList.add('on');
-    document.getElementById('presetNote').innerHTML = PRESETS.custom.note;
+    document.getElementById('presetNote').innerHTML=PRESETS.custom.note;
     calcProd();
   });
 });
 ['pL','sc','rc'].forEach(function(id){document.getElementById(id).addEventListener('input',calcProd);});
-['fL','gP','gyP','sorP','ptpP','bagP','boxPA','bPC','sH','mG','targetPrice'].forEach(function(id){
+['fL','ptpP','bagP','boxPA','boxCost','bPC','boxCartonCost','sH','mG','targetPrice'].forEach(function(id){
   document.getElementById(id).addEventListener('input',calcCost);
 });
 document.getElementById('fM').addEventListener('input',function(){
-  S.fM = +this.value || 0;
+  S.fM=+this.value||0;
   updateShellSuggest();
   renderOilComponents();
   calcCost();
 });
-['prBase','prLabel','prDot','prShrink'].forEach(function(id){document.getElementById(id).addEventListener('input',calcCost);});
-['adBase','adLabel','adDot','adShrink'].forEach(function(id){document.getElementById(id).addEventListener('change',calcCost);});
+['prBase','prLabel','prDot','prShrink','prInsert','prDesi'].forEach(function(id){document.getElementById(id).addEventListener('input',calcCost);});
+['adBase','adLabel','adDot','adShrink','adInsert','adDesi'].forEach(function(id){document.getElementById(id).addEventListener('change',calcCost);});
 
-// 初始化
-S.fM = +document.getElementById('fM').value || 500;
+// ═══ 初始化 ═══
+S.fM=+document.getElementById('fM').value||500;
 calcProd();
 renderOilComponents();
 updateShellSuggest();
